@@ -1,0 +1,5 @@
+07/03/25
+
+-> feat: completed APIs for auth, blogs, authors, and categories- Implemented login and registration- CRUD operations for blogs- CRUD operations for blog authors- CRUD operations for categories.
+-> Blog and Category (add Resource and paginate).
+-> Set up Passport authentication for separate user and admin guards with personal access clients.
