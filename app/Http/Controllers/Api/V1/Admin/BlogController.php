@@ -41,14 +41,17 @@ class BlogController extends Controller
     {
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|unique:blogs,slug',
+            'slug' => 'required|string|unique:blogs,slug',
             'description' => 'nullable|string',
+            'excerpt' => 'nullable|string|max:500',
             'image' => 'nullable|string',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:255',
-            'content' => 'nullable|string',
             'author' => 'nullable|string|max:255',
-            'published_at' => 'nullable|date',
+            'author_email' => 'nullable|email|max:255',
+            'status' => 'nullable|in:draft,published',
+            'category' => 'nullable|string|max:255',
+            'tags' => 'nullable|string|max:255',
         ]);
 
         if (empty($data['slug'])) {
@@ -81,16 +84,20 @@ class BlogController extends Controller
         }
 
         $data = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'slug' => 'sometimes|nullable|string|unique:blogs,slug,' . $blog->id,
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|unique:blogs,slug',
             'description' => 'nullable|string',
+            'excerpt' => 'nullable|string|max:500',
             'image' => 'nullable|string',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:255',
-            'content' => 'nullable|string',
             'author' => 'nullable|string|max:255',
-            'published_at' => 'nullable|date',
+            'author_email' => 'nullable|email|max:255',
+            'status' => 'nullable|in:draft,published',
+            'category' => 'nullable|string|max:255',
+            'tags' => 'nullable|string|max:255',
         ]);
+
 
         if (!empty($data['title']) && empty($data['slug'])) {
             $data['slug'] = Str::slug($data['title']);
@@ -107,7 +114,6 @@ class BlogController extends Controller
                 'message' => 'Blog update successfully',
                 'data' => new BlogResource($updatedBlog)
             ], 200);
-
         } catch (\Exception $e) {
             Log::error('Blog Update Error: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to update blog' . $e->getMessage()], 500);

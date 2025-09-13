@@ -20,16 +20,26 @@ Route::prefix('v1')->group(function () {
     Route::get('/auth/google/redirect', [UserAuthController::class, 'redirectToGoogle']);
     Route::get('/auth/google/callback', [UserAuthController::class, 'handleGoogleCallback']);
 
+    // User Email/Password Auth
+    Route::post('/register', [UserAuthController::class, 'register']);
+    Route::post('/login', [UserAuthController::class, 'login']);
+    Route::post('/forgot-password', [UserAuthController::class, 'forgotPassword']);
+    Route::post('/reset-password', [UserAuthController::class, 'resetPassword']); 
+
+    Route::get('/blogs', [UserBlogController::class, 'index']);
+    Route::get('/blogs/{slug}', [UserBlogController::class, 'show']);
+
+    Route::get('/faqs', [UserFaqController::class, 'index']);
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [UserAuthController::class, 'logout']);
+        Route::get('/user', [UserAuthController::class, 'user']);
+
         Route::post('/subscribe', [StripeSubscriptionController::class, 'subscribe']);
         Route::post('/subscription/cancel', [StripeSubscriptionController::class, 'cancel']);
         Route::get('/subscription/status', [StripeSubscriptionController::class, 'status']);
 
-        Route::get('/blogs', [UserBlogController::class, 'index']);
-        Route::get('/blogs/{slug}', [UserBlogController::class, 'show']);
-
-        Route::get('/faqs', [UserFaqController::class, 'index']);
+        
 
         Route::post('/albums', [UserAlbumController::class, 'create']);
         Route::get('/albums/list', [UserAlbumController::class, 'list']);
@@ -47,13 +57,13 @@ Route::prefix('v1')->group(function () {
 
             Route::get('/blogs', [AdminBlogController::class, 'index']);
             Route::get('/blogs/{slug}', [UserBlogController::class, 'show']);
-            Route::post('/blogs', [AdminBlogController::class, 'store']);
+            Route::post('/blogs/store', [AdminBlogController::class, 'store']);
             Route::put('/blogs/{slug}', [AdminBlogController::class, 'update']);
             Route::delete('/blogs/{slug}', [AdminBlogController::class, 'destroy']);
 
             Route::get('/faqs', [AdminFaqController::class, 'index']);
             Route::get('/faqs/{id}', [AdminFaqController::class, 'show']);
-            Route::post('/faqs', [AdminFaqController::class, 'store']);
+            Route::post('/faqs/store', [AdminFaqController::class, 'store']);
             Route::put('/faqs/{id}', [AdminFaqController::class, 'update']);
             Route::delete('/faqs/{id}', [AdminFaqController::class, 'destroy']);
 

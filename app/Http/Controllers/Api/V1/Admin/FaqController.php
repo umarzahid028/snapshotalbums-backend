@@ -15,7 +15,7 @@ class FaqController extends Controller
     public function index()
     {
         try {
-            $faqs = Faq::where('is_active', true)->latest()->get();
+            $faqs = Faq::latest()->get();
             return FaqResource::collection($faqs);
         } catch (\Exception $e) {
             Log::error('FAQ Index Error: '.$e->getMessage());
@@ -40,19 +40,20 @@ class FaqController extends Controller
     {
         $request->validate([
             'question' => 'required|string|max:255',
-            'answer' => 'nullable|string',
-            'is_active' => 'nullable|boolean',
+            'answer' => 'required|string',
+            'is_active' => 'required|boolean',
+            'category' => 'required|string',
+            'order' => 'required|numeric',
         ]);
 
         try {
             $faq = DB::transaction(function () use ($request) {
-                return Faq::create($request->only('question', 'answer', 'is_active'));
+                return Faq::create($request->only('question', 'answer', 'is_active','category' ,'order'));
             });
 
             return response()->json([
                 'success' => true,
                 'message' => 'Faq Store successfully',
-                'data' => new FaqResource($faq)
             ], 200);
         } catch (\Exception $e) {
             Log::error('FAQ Store Error: '.$e->getMessage());
@@ -65,21 +66,22 @@ class FaqController extends Controller
     {
         $request->validate([
             'question' => 'sometimes|required|string|max:255',
-            'answer' => 'nullable|string',
-            'is_active' => 'nullable|boolean',
+            'answer' => 'required|string',
+            'is_active' => 'required|boolean',
+            'category' => 'required|string',
+            'order' => 'required|numeric',
         ]);
 
         try {
             $faq = Faq::findOrFail($id);
 
             DB::transaction(function () use ($faq, $request) {
-                $faq->update($request->only('question', 'answer', 'is_active'));
+                $faq->update($request->only('question', 'answer', 'is_active','category' ,'order'));
             });
 
             return response()->json([
                 'success' => true,
                 'message' => 'Faq update successfully',
-                'data' => new FaqResource($faq)
             ], 200);
         } catch (\Exception $e) {
             Log::error('FAQ Update Error: '.$e->getMessage());
