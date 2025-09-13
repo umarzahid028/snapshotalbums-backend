@@ -36,7 +36,7 @@ class AlbumController extends Controller
     public function list()
     {
         try {
-            $albums = Album::where('user_id', Auth::id())->get();
+            $albums = Album::where('user_id', Auth::id())->latest()->get();
 
             return response()->json([
                 'success' => true,
@@ -64,6 +64,14 @@ class AlbumController extends Controller
 
         $request->validate([
             'event_title' => 'required|string|max:255',
+            'event_type' => 'nullable|string|max:255',
+            'event_time' => 'nullable|date_format:Y-m-d H:i:s',
+            'location' => 'nullable|string|max:255',
+            'event_description' => 'nullable|string',
+            'max_photos_per_guest' => 'nullable|integer|min:1',
+            'custom_welcome_message' => 'nullable|string',
+            'privacy_level' => 'nullable|in:private,public',
+            'allow_guest_uploads' => 'nullable|boolean',
             'google_drive_folder_name' => 'required|string|max:255',
             'event_date' => 'required|date',
         ]);
@@ -168,14 +176,23 @@ class AlbumController extends Controller
             // Make folder public (optional)
             $this->makeFolderPublic($folderId);
 
+            $folderId = 'asd12dd12ds122s12';
             // Save Album in a transaction
             $album = DB::transaction(function () use ($user, $request, $folderId) {
                 return Album::create([
                     'user_id' => $user->id,
-                    'event_title' => $request->input('event_title'),
-                    'google_drive_folder_name' => $request->input('google_drive_folder_name'),
-                    'google_drive_folder_id' => $folderId,
-                    'event_date' => $request->input('event_date'),
+                    'event_title' => $request->input('event_title') ?? null,
+                    'event_type' => $request->input('event_type') ?? null,
+                    'event_time' => $request->input('event_time') ?? null,
+                    'location' => $request->input('location') ?? null,
+                    'event_description' => $request->input('event_description') ?? null,
+                    'max_photos_per_guest' => $request->input('max_photos_per_guest') ?? null,
+                    'custom_welcome_message' => $request->input('custom_welcome_message') ?? null,
+                    'privacy_level' => $request->input('privacy_level', 'private'), // default to private
+                    'allow_guest_uploads' => $request->input('allow_guest_uploads', true)  ?? null, // default true
+                    'google_drive_folder_name' => $request->input('google_drive_folder_name')  ?? null,
+                    'google_drive_folder_id' => $folderId  ?? null,
+                    'event_date' => $request->input('event_date') ?? null,
                 ]);
             });
 

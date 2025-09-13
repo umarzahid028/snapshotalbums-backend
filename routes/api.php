@@ -7,12 +7,12 @@ use App\Http\Controllers\Api\V1\User\StripeSubscriptionController;
 use App\Http\Controllers\Api\V1\User\BlogController as UserBlogController;
 use App\Http\Controllers\Api\V1\User\FaqController as UserFaqController;
 use App\Http\Controllers\Api\V1\User\AlbumController as UserAlbumController;
+use App\Http\Controllers\Api\V1\User\DashboardController as UserDashboardController;
 
 use App\Http\Controllers\Api\V1\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Api\V1\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Api\V1\Admin\FaqController as AdminFaqController;
 use App\Http\Controllers\Api\V1\Admin\SubscriptionPlanController as AdminSubscriptionPlanController;
-
 
 
 Route::prefix('v1')->group(function () {
@@ -33,6 +33,9 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [UserAuthController::class, 'logout']);
+        
+        Route::get('/dashboard', [UserDashboardController::class, 'index']);
+        
         Route::get('/user', [UserAuthController::class, 'user']);
 
         Route::post('/subscribe', [StripeSubscriptionController::class, 'subscribe']);
