@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Api\V1\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Api\V1\Admin\FaqController as AdminFaqController;
 use App\Http\Controllers\Api\V1\Admin\SubscriptionPlanController as AdminSubscriptionPlanController;
+use App\Http\Controllers\Api\V1\Admin\UserController as AdminUserController;
 
 
 Route::prefix('v1')->group(function () {
@@ -36,6 +37,8 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [UserAuthController::class, 'logout']);
+
+        Route::post('/get-token', [UserAuthController::class, 'token']);
         
         Route::get('/user-dashboard', [UserDashboardController::class, 'index']);
         
@@ -60,6 +63,12 @@ Route::prefix('v1')->group(function () {
 
         Route::middleware('auth:admin')->group(function () {
             Route::post('/logout', [AdminAuthController::class, 'logout']);
+
+            Route::get('/all-user', [AdminUserController::class, 'index']);
+            Route::post('/user', [AdminUserController::class, 'store']);
+            Route::get('/user/{id}', [AdminUserController::class, 'show']);
+            Route::put('/user/{id}', [AdminUserController::class, 'update']);
+            Route::delete('/user/{id}', [AdminUserController::class, 'destroy']);
 
             Route::get('/blogs', [AdminBlogController::class, 'index']);
             Route::get('/blogs/{slug}', [UserBlogController::class, 'show']);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -42,7 +43,7 @@ class AuthController extends Controller
                 'token' => $token,
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Admin Register Error: '.$e->getMessage());
+            Log::error('Admin Register Error: ' . $e->getMessage());
             return response()->json(['error' => 'Registration failed'], 500);
         }
     }
@@ -97,8 +98,10 @@ class AuthController extends Controller
                 return response()->json(['message' => 'Failed to send reset link.'], 500);
             }
         } catch (\Exception $e) {
-            Log::error('Forgot Password Error: '.$e->getMessage());
+            Log::error('Forgot Password Error: ' . $e->getMessage());
             return response()->json(['error' => 'Something went wrong.'], 500);
         }
     }
+
+    
 }

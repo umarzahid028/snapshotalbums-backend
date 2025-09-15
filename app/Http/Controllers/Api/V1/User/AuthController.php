@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
@@ -131,7 +132,7 @@ class AuthController extends Controller
             $driveAccount = DriveAccount::updateOrCreate(
                 [
                     'user_id'     => '9',
-                    'drive_email' => $googleUser->getEmail(), 
+                    'drive_email' => $googleUser->getEmail(),
                 ],
                 [
                     'drive_name'             => $googleUser->getName(),
@@ -151,14 +152,12 @@ class AuthController extends Controller
             // ]);
 
             return redirect("http://localhost:5173/google/callback?drive_connected=true&drive_token=$token&user=" . urlencode(json_encode($safeUser)));
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Google Drive connection failed: ' . $e->getMessage(),
             ], 500);
             return redirect("http://localhost:5173/google/callback?success=false&error=" . urlencode($e->getMessage()));
-
         }
     }
 
@@ -250,5 +249,90 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         return response()->json($request->user());
+    }
+
+    public function token(Request $request)
+    {
+        $code = $request->input('code');
+
+        if (!$code) {
+            return response()->json(['error' => 'No code provided'], 400);
+        }
+
+        // Exchange code for access token
+        $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
+            'code' => $code,
+            'client_id' => env('GOOGLE_CLIENT_ID'),
+            'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+            'redirect_uri' => env('GOOGLE_REDIRECT_URI'),
+            'grant_type' => 'authorization_code',
+        ]);
+
+        if ($response->failed()) {
+            return response()->json(['error' => 'Failed to get access token'], 500);
+        }
+
+        $tokenData = $response->json();
+        $accessToken = $tokenData['access_token'];
+
+        // Get user info from Google
+        $googleUserResponse = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->get('https://www.googleapis.com/oauth2/v2/userinfo');
+
+        if ($googleUserResponse->failed()) {
+            return response()->json(['error' => 'Failed to fetch Google user info'], 500);
+        }
+
+        $googleUser = (object) $googleUserResponse->json(); // convert array to object
+
+        // Check if user exists by Google ID or email
+        $user = User::where('google_id', $googleUser->id)
+            ->orWhere('email', $googleUser->email)
+            ->first();
+
+        if ($user) {
+            $user->update([
+                'google_id' => $googleUser->id,
+                'avatar' => $googleUser->picture,
+                'google_token' => $accessToken,
+                'google_refresh_token' => $tokenData['refresh_token'] ?? null,
+                'google_token_expires_in' => $tokenData['expires_in'],
+            ]);
+        } else {
+            $user = User::create([
+                'name' => $googleUser->name,
+                'email' => $googleUser->email,
+                'google_id' => $googleUser->id,
+                'avatar' => $googleUser->picture,
+                'password' => bcrypt(Str::random(16)),
+                'google_token' => $accessToken,
+                'google_refresh_token' => $tokenData['refresh_token'] ?? null,
+                'google_token_expires_in' => $tokenData['expires_in'],
+            ]);
+        }
+
+        // Store or update Drive account
+        $driveAccount = DriveAccount::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'drive_email' => $googleUser->email,
+            ],
+            [
+                'drive_name' => $googleUser->name,
+                'google_id' => $googleUser->id,
+                'avatar' => $googleUser->picture,
+                'google_token' => $accessToken,
+                'google_refresh_token' => $tokenData['refresh_token'] ?? null,
+                'google_token_expires_in' => $tokenData['expires_in'],
+                'access_token' => $accessToken,
+            ]
+        );
+
+        return response()->json([
+            'user' => $user,
+            'driveAccount' => $driveAccount,
+            'tokenData' => $tokenData,
+        ]);
     }
 }
