@@ -25,6 +25,8 @@ class Album extends Model
         'event_date',
         'status',
         'qrCode',
+        'total_guests',
+        'total_files',
     ];
 
     public function user()

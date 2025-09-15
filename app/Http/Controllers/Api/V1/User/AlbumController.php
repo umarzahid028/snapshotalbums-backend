@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\DriveAccount;
 use App\Models\Album;
 use App\Models\User;
 use App\Models\UserSubscription;
@@ -80,12 +81,20 @@ class AlbumController extends Controller
             $user = Auth::user();
 
             $checkAlbumCount = Album::where('user_id', $user->id)->count();
+            $driveAccount = DriveAccount::where('user_id', $user->id)->latest()->first();
             $subscription = UserSubscription::where('user_id', $user->id)->latest()->first();
 
             if (!$subscription) {
                 return response()->json([
                     'success' => false,
                     'message' => 'No subscription found.'
+                ], 404);
+            }
+
+            if (!$driveAccount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please connect the drive account.'
                 ], 404);
             }
 
@@ -117,7 +126,7 @@ class AlbumController extends Controller
                 ], 403);
             }
 
-            if (!$user->google_token) {
+            if (!$driveAccount->google_token) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Google Drive access token not found.'
@@ -126,15 +135,15 @@ class AlbumController extends Controller
 
             // Set user's access token
             $this->gClient->setAccessToken([
-                'access_token'  => $user->google_token,
-                'refresh_token' => $user->google_refresh_token,
-                'expires_in'    => $user->google_token_expires_in,
+                'access_token'  => $driveAccount->google_token,
+                'refresh_token' => $driveAccount->google_refresh_token,
+                'expires_in'    => $driveAccount->google_token_expires_in,
                 'created'       => time(),
             ]);
 
             // If expired, refresh
             if ($this->gClient->isAccessTokenExpired()) {
-                $newToken = $this->gClient->fetchAccessTokenWithRefreshToken($user->google_refresh_token);
+                $newToken = $this->gClient->fetchAccessTokenWithRefreshToken($driveAccount->google_refresh_token);
 
                 if (isset($newToken['error'])) {
                     return response()->json([
@@ -146,15 +155,15 @@ class AlbumController extends Controller
 
                 // Merge old + new token data
                 $updatedToken = array_merge([
-                    'access_token'  => $user->google_token,
-                    'refresh_token' => $user->google_refresh_token,
-                    'expires_in'    => $user->google_token_expires_in,
+                    'access_token'  => $driveAccount->google_token,
+                    'refresh_token' => $driveAccount->google_refresh_token,
+                    'expires_in'    => $driveAccount->google_token_expires_in,
                     'created'       => time(),
                 ], $newToken);
 
-                $user->update([
+                $driveAccount->update([
                     'google_token'          => $updatedToken['access_token'],
-                    'google_refresh_token'  => $updatedToken['refresh_token'] ?? $user->google_refresh_token,
+                    'google_refresh_token'  => $updatedToken['refresh_token'] ?? $driveAccount->google_refresh_token,
                     'google_token_expires_in' => $updatedToken['expires_in'],
                     'google_token_json'     => json_encode($updatedToken),
                 ]);
@@ -338,3 +347,8 @@ class AlbumController extends Controller
         }
     }
 }
+
+
+
+
+

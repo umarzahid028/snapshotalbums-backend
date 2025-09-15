@@ -20,9 +20,12 @@ Route::prefix('v1')->group(function () {
     Route::get('/auth/google/redirect', [UserAuthController::class, 'redirectToGoogle']);
     Route::get('/auth/google/callback', [UserAuthController::class, 'handleGoogleCallback']);
 
+    Route::get('/google/connect-drive/callback', [UserAuthController::class, 'handleConnectGoogleDriveCallback']);
+
+
     // User Email/Password Auth
     Route::post('/register', [UserAuthController::class, 'register']);
-    Route::post('/login', [UserAuthController::class, 'login']);
+    Route::post('/login', [UserAuthController::class, 'login'])->name('login');
     Route::post('/forgot-password', [UserAuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [UserAuthController::class, 'resetPassword']); 
 
@@ -34,15 +37,15 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [UserAuthController::class, 'logout']);
         
-        Route::get('/dashboard', [UserDashboardController::class, 'index']);
+        Route::get('/user-dashboard', [UserDashboardController::class, 'index']);
         
         Route::get('/user', [UserAuthController::class, 'user']);
+
+        Route::get('/google/connect-drive', [UserAuthController::class, 'connectGoogleDrive']);
 
         Route::post('/subscribe', [StripeSubscriptionController::class, 'subscribe']);
         Route::post('/subscription/cancel', [StripeSubscriptionController::class, 'cancel']);
         Route::get('/subscription/status', [StripeSubscriptionController::class, 'status']);
-
-        
 
         Route::post('/albums', [UserAlbumController::class, 'create']);
         Route::get('/albums/list', [UserAlbumController::class, 'list']);

@@ -27,11 +27,13 @@ class User extends Authenticatable
 
         // Google fields
         'google_id',
+        'drive_email',
+        'drive_connect_name',
         'avatar',
         'google_token',
         'google_refresh_token',
         'google_token_expires_in',
-    
+
         'access_token',
         'stripe_customer_id',
     ];
@@ -49,5 +51,10 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return false;
+    }
+
+    public function driveAccounts()
+    {
+        return $this->hasMany(DriveAccount::class);
     }
 }
