@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Http;
+use Laravel\Sanctum\HasApiTokens;
+
 
 class AuthController extends Controller
 {
@@ -338,10 +340,13 @@ class AuthController extends Controller
             );
         }
 
+        $authToken = $user->createToken('bazzre-auth')->plainTextToken;
+        
         return response()->json([
             'user' => $user,
             'driveAccount' => $driveAccount,
             'tokenData' => $tokenData,
+            'bazzreToken' => $authToken,
         ]);
     }
 }
