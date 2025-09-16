@@ -35,10 +35,10 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/faqs', [UserFaqController::class, 'index']);
 
+    Route::post('/get-token', [UserAuthController::class, 'token']);
+    
     Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/logout', [UserAuthController::class, 'logout']);
-
-        Route::post('/get-token', [UserAuthController::class, 'token']);
+        Route::post('/logout', [UserAuthController::class, 'logout']);      
         
         Route::get('/user-dashboard', [UserDashboardController::class, 'index']);
         

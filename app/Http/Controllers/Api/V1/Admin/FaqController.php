@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Faq;
+use App\Models\FAQ;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +15,7 @@ class FaqController extends Controller
     public function index()
     {
         try {
-            $faqs = Faq::latest()->get();
+            $faqs = FAQ::latest()->get();
             return FaqResource::collection($faqs);
         } catch (\Exception $e) {
             Log::error('FAQ Index Error: '.$e->getMessage());
@@ -27,7 +27,7 @@ class FaqController extends Controller
     public function show($id)
     {
         try {
-            $faq = Faq::findOrFail($id);
+            $faq = FAQ::findOrFail($id);
             return new FaqResource($faq);
         } catch (\Exception $e) {
             Log::error('FAQ Show Error: '.$e->getMessage());
@@ -48,7 +48,7 @@ class FaqController extends Controller
 
         try {
             $faq = DB::transaction(function () use ($request) {
-                return Faq::create($request->only('question', 'answer', 'is_active','category' ,'order'));
+                return FAQ::create($request->only('question', 'answer', 'is_active','category' ,'order'));
             });
 
             return response()->json([
@@ -73,7 +73,7 @@ class FaqController extends Controller
         ]);
 
         try {
-            $faq = Faq::findOrFail($id);
+            $faq = FAQ::findOrFail($id);
 
             DB::transaction(function () use ($faq, $request) {
                 $faq->update($request->only('question', 'answer', 'is_active','category' ,'order'));
@@ -93,7 +93,7 @@ class FaqController extends Controller
     public function destroy($id)
     {
         try {
-            $faq = Faq::findOrFail($id);
+            $faq = FAQ::findOrFail($id);
 
             DB::transaction(function () use ($faq) {
                 $faq->delete();

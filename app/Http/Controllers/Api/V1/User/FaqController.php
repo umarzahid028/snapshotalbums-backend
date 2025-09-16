@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\Faq;
+use App\Models\FAQ;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +16,7 @@ class FaqController extends Controller
     public function index()
     {
         try {
-            $faqs = Faq::where('is_active', true)->latest()->get();
+            $faqs = FAQ::where('is_active', true)->latest()->get();
             return FaqResource::collection($faqs);
         } catch (\Exception $e) {
             Log::error('FAQ Index Error: ' . $e->getMessage());

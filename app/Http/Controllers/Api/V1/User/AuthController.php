@@ -31,7 +31,7 @@ class AuthController extends Controller
             ])
             ->with(['access_type' => 'offline', 'prompt' => 'consent']) // ensures refresh token
             ->stateless()
-            ->redirectUrl(config('services.google.redirect'))
+            ->redirectUrl(config('services.google.redirect_login'))
             ->redirect()
             ->getTargetUrl();
 
@@ -265,7 +265,7 @@ class AuthController extends Controller
             'code' => $code,
             'client_id' => env('GOOGLE_CLIENT_ID'),
             'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-            'redirect_uri' => env('GOOGLE_REDIRECT_URI'),
+            'redirect_uri' => env('GOOGLE_REDIRECT_URI_LOGIN'),
             'grant_type' => 'authorization_code',
         ]);
 
