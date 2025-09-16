@@ -265,7 +265,7 @@ class AuthController extends Controller
         $redirect = env('GOOGLE_REDIRECT_URI_LOGIN');
 
         if ($value === 'drive') {
-            $redirect = env('GOOGLE_REDIRECT_URI_DRIVE');
+            $redirect = env('GOOGLE_REDIRECT_URI');
         }
         // Exchange code for access token
         $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
