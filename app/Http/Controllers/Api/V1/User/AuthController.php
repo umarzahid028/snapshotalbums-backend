@@ -254,6 +254,7 @@ class AuthController extends Controller
     public function token(Request $request)
     {
         $code = $request->input('code');
+        $value = $request->input('value');
 
         if (!$code) {
             return response()->json(['error' => 'No code provided'], 400);
@@ -269,7 +270,7 @@ class AuthController extends Controller
         ]);
 
         if ($response->failed()) {
-            return response()->json(['error' => 'Failed to get access token'], 500);
+            return response()->json(['error' => 'Failed to get access token', 'details' => $response->body()], 500);
         }
 
         $tokenData = $response->json();
@@ -287,8 +288,7 @@ class AuthController extends Controller
         $googleUser = (object) $googleUserResponse->json(); // convert array to object
 
         // Check if user exists by Google ID or email
-        $user = User::where('google_id', $googleUser->id)
-            ->orWhere('email', $googleUser->email)
+        $user = User::Where('email', $googleUser->email)->orwhere('google_id', $googleUser->id)
             ->first();
 
         if ($user) {
@@ -300,34 +300,38 @@ class AuthController extends Controller
                 'google_token_expires_in' => $tokenData['expires_in'],
             ]);
         } else {
-            $user = User::create([
-                'name' => $googleUser->name,
-                'email' => $googleUser->email,
-                'google_id' => $googleUser->id,
-                'avatar' => $googleUser->picture,
-                'password' => bcrypt(Str::random(16)),
-                'google_token' => $accessToken,
-                'google_refresh_token' => $tokenData['refresh_token'] ?? null,
-                'google_token_expires_in' => $tokenData['expires_in'],
-            ]);
+            if($value == 'login'){
+                $user = User::create([
+                    'name' => $googleUser->name,
+                    'email' => $googleUser->email,
+                    'google_id' => $googleUser->id,
+                    'avatar' => $googleUser->picture,
+                    'password' => bcrypt(Str::random(16)),
+                    'google_token' => $accessToken,
+                    'google_refresh_token' => $tokenData['refresh_token'] ?? null,
+                    'google_token_expires_in' => $tokenData['expires_in'],
+                ]);
+            }
         }
 
-        // Store or update Drive account
-        $driveAccount = DriveAccount::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'drive_email' => $googleUser->email,
-            ],
-            [
-                'drive_name' => $googleUser->name,
-                'google_id' => $googleUser->id,
-                'avatar' => $googleUser->picture,
-                'google_token' => $accessToken,
-                'google_refresh_token' => $tokenData['refresh_token'] ?? null,
-                'google_token_expires_in' => $tokenData['expires_in'],
-                'access_token' => $accessToken,
-            ]
-        );
+        $driveAccount = [];
+        if($value == 'drive'){
+            $driveAccount = DriveAccount::updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'drive_email' => $googleUser->email,
+                ],
+                [
+                    'drive_name' => $googleUser->name,
+                    'google_id' => $googleUser->id,
+                    'avatar' => $googleUser->picture,
+                    'google_token' => $accessToken,
+                    'google_refresh_token' => $tokenData['refresh_token'] ?? null,
+                    'google_token_expires_in' => $tokenData['expires_in'],
+                    'access_token' => $accessToken,
+                ]
+            );
+        }
 
         return response()->json([
             'user' => $user,
