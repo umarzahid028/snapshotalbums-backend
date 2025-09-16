@@ -260,12 +260,17 @@ class AuthController extends Controller
             return response()->json(['error' => 'No code provided'], 400);
         }
 
+        $redirect = env('GOOGLE_REDIRECT_URI_LOGIN');
+
+        if ($value === 'drive') {
+            $redirect = env('GOOGLE_REDIRECT_URI_DRIVE');
+        }
         // Exchange code for access token
         $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
             'code' => $code,
             'client_id' => env('GOOGLE_CLIENT_ID'),
             'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-            'redirect_uri' => env('GOOGLE_REDIRECT_URI_LOGIN'),
+            'redirect_uri' => $redirect,
             'grant_type' => 'authorization_code',
         ]);
 
@@ -300,7 +305,7 @@ class AuthController extends Controller
                 'google_token_expires_in' => $tokenData['expires_in'],
             ]);
         } else {
-            if($value == 'login'){
+            if ($value == 'login') {
                 $user = User::create([
                     'name' => $googleUser->name,
                     'email' => $googleUser->email,
@@ -315,7 +320,7 @@ class AuthController extends Controller
         }
 
         $driveAccount = [];
-        if($value == 'drive'){
+        if ($value == 'drive') {
             $driveAccount = DriveAccount::updateOrCreate(
                 [
                     'user_id' => $user->id,
