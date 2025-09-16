@@ -114,52 +114,52 @@ class AuthController extends Controller
         ]);
     }
 
-    public function handleConnectGoogleDriveCallback(Request $request)
-    {
-        try {
-            $googleUser = Socialite::driver('google')->stateless()->user();
+    // public function handleConnectGoogleDriveCallback(Request $request)
+    // {
+    //     try {
+    //         $googleUser = Socialite::driver('google')->stateless()->user();
 
-            // $user = Auth::user();
+    //         // $user = Auth::user();
 
-            // if (!$user) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'Unauthorized',
-            //     ], 401);
-            // }
+    //         // if (!$user) {
+    //         //     return response()->json([
+    //         //         'success' => false,
+    //         //         'message' => 'Unauthorized',
+    //         //     ], 401);
+    //         // }
 
-            // Create or update drive account for this user
-            $driveAccount = DriveAccount::updateOrCreate(
-                [
-                    'user_id'     => '9',
-                    'drive_email' => $googleUser->getEmail(),
-                ],
-                [
-                    'drive_name'             => $googleUser->getName(),
-                    'google_id'              => $googleUser->getId(),
-                    'avatar'                 => $googleUser->getAvatar(),
-                    'google_token'           => $googleUser->token,
-                    'google_refresh_token'   => $googleUser->refreshToken,
-                    'google_token_expires_in' => $googleUser->expiresIn,
-                    'access_token'           => $googleUser->token,
-                ]
-            );
+    //         // Create or update drive account for this user
+    //         $driveAccount = DriveAccount::updateOrCreate(
+    //             [
+    //                 'user_id'     => '9',
+    //                 'drive_email' => $googleUser->getEmail(),
+    //             ],
+    //             [
+    //                 'drive_name'             => $googleUser->getName(),
+    //                 'google_id'              => $googleUser->getId(),
+    //                 'avatar'                 => $googleUser->getAvatar(),
+    //                 'google_token'           => $googleUser->token,
+    //                 'google_refresh_token'   => $googleUser->refreshToken,
+    //                 'google_token_expires_in' => $googleUser->expiresIn,
+    //                 'access_token'           => $googleUser->token,
+    //             ]
+    //         );
 
-            // return response()->json([
-            //     'success' => true,
-            //     'message' => 'Google Drive connected successfully',
-            //     'data'    => $driveAccount,
-            // ]);
+    //         // return response()->json([
+    //         //     'success' => true,
+    //         //     'message' => 'Google Drive connected successfully',
+    //         //     'data'    => $driveAccount,
+    //         // ]);
 
-            return redirect("http://localhost:5173/google/callback?drive_connected=true&drive_token=$token&user=" . urlencode(json_encode($safeUser)));
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Google Drive connection failed: ' . $e->getMessage(),
-            ], 500);
-            return redirect("http://localhost:5173/google/callback?success=false&error=" . urlencode($e->getMessage()));
-        }
-    }
+    //         return redirect("http://localhost:5173/google/callback?drive_connected=true&drive_token=$token&user=" . urlencode(json_encode($safeUser)));
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Google Drive connection failed: ' . $e->getMessage(),
+    //         ], 500);
+    //         return redirect("http://localhost:5173/google/callback?success=false&error=" . urlencode($e->getMessage()));
+    //     }
+    // }
 
 
 

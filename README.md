@@ -17,3 +17,33 @@ STRIPE_SECRET=sk_test_51Q67z3J3iozVoSiOCV9087J6fQEWqMaMC976QrE7k0y2XYgRDTSr8GvmQ
 GOOGLE_CLIENT_ID=540695287885-pvmk1jmidm749stqu6rffhalps2bnbpr.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=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
 GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/api/v1/auth/google/callback
+
+
+<?php
+return [
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+
+    'allowed_methods' => ['*'],
+
+    'allowed_origins' => [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://localhost:8000',
+        'http://127.0.0.1:8000',
+        'http://localhost:5174',
+        'http://127.0.0.1:5174',
+        'https://snapshotalbums.vercel.app'
+    ],
+
+    'allowed_origins_patterns' => [],
+
+    'allowed_headers' => ['*'],
+
+    'exposed_headers' => [],
+
+    'max_age' => 0,
+
+    'supports_credentials' => true,
+];
