@@ -24,6 +24,7 @@ return new class extends Migration
             $table->text('google_refresh_token')->nullable();
             $table->integer('google_token_expires_in')->nullable();
             $table->text('access_token')->nullable();
+            $table->json('json_token')->nullable();
             $table->timestamps();
         });
     }
