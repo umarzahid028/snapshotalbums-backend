@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('event_title');
             $table->string('google_drive_folder_id')->nullable();
-            $table->string('google_drive_folder_name');
+            // $table->string('google_drive_folder_name');
             $table->date('event_date');
             $table->timestamps();
         });

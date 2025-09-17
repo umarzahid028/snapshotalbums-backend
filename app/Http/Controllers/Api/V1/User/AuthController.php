@@ -322,7 +322,9 @@ class AuthController extends Controller
         }
 
         $driveAccount = [];
-        if ($value == 'drive') {
+        if ($value == 'drive' && $user ) {
+            $jsonToken = $tokenData;
+            $jsonToken['created'] = time();
             $driveAccount = DriveAccount::updateOrCreate(
                 [
                     'user_id' => $user->id,
@@ -336,17 +338,33 @@ class AuthController extends Controller
                     'google_refresh_token' => $tokenData['refresh_token'] ?? null,
                     'google_token_expires_in' => $tokenData['expires_in'],
                     'access_token' => $accessToken,
+                    'json_token' => json_encode($jsonToken),
                 ]
             );
         }
 
         $authToken = $user->createToken('bazzre-auth')->plainTextToken;
-        
+
         return response()->json([
-            'user' => $user,
-            'driveAccount' => $driveAccount,
-            'tokenData' => $tokenData,
+            'user' => [
+                'name'   => $user->name,
+                'email'  => $user->email,
+                'avatar' => $user->avatar,
+            ],
+            'driveAccount' => $driveAccount ? [
+                'drive_name'  => $driveAccount->drive_name,
+                'drive_email' => $driveAccount->drive_email,
+                'avatar'      => $driveAccount->avatar,
+            ] : null,
             'bazzreToken' => $authToken,
+            'tokenData' => $tokenData,
         ]);
+
+        // return response()->json([
+        //     'user' => $user,
+        //     'driveAccount' => $driveAccount,
+        //     'tokenData' => $tokenData,
+        //     'bazzreToken' => $authToken,
+        // ]);
     }
 }

@@ -69,11 +69,7 @@ class AlbumController extends Controller
             'event_time' => 'nullable|date_format:Y-m-d H:i:s',
             'location' => 'nullable|string|max:255',
             'event_description' => 'nullable|string',
-            'max_photos_per_guest' => 'nullable|integer|min:1',
-            'custom_welcome_message' => 'nullable|string',
-            'privacy_level' => 'nullable|in:private,public',
-            'allow_guest_uploads' => 'nullable|boolean',
-            'google_drive_folder_name' => 'required|string|max:255',
+            // 'google_drive_folder_name' => 'required|string|max:255',
             'event_date' => 'required|date',
         ]);
 
@@ -84,47 +80,47 @@ class AlbumController extends Controller
             $driveAccount = DriveAccount::where('user_id', $user->id)->latest()->first();
             $subscription = UserSubscription::where('user_id', $user->id)->latest()->first();
 
-            if (!$subscription) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No subscription found.'
-                ], 404);
-            }
+            // if (!$subscription) {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'No subscription found.'
+            //     ], 404);
+            // }
 
-            if (!$driveAccount) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Please connect the drive account.'
-                ], 404);
-            }
+            // if (!$driveAccount) {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'Please connect the drive account.'
+            //     ], 404);
+            // }
 
-            if ($subscription && $checkAlbumCount > $subscription->plan_no_of_albums) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'You have reached the maximum number of albums allowed for your plan.'
-                ], 403);
-            }
+            // if ($subscription && $checkAlbumCount > $subscription->plan_no_of_albums) {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'You have reached the maximum number of albums allowed for your plan.'
+            //     ], 403);
+            // }
 
-            // 🔹 Check active paid subscription
-            if (
-                $subscription->transaction_id &&
-                $subscription->status === 'active' &&
-                $subscription->transaction_status === 'succeeded'
-            ) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Your subscription is active.',
-                    'data' => $subscription
-                ], 200);
-            }
+            // // 🔹 Check active paid subscription
+            // if (
+            //     $subscription->transaction_id &&
+            //     $subscription->status === 'active' &&
+            //     $subscription->transaction_status === 'succeeded'
+            // ) {
+            //     return response()->json([
+            //         'success' => true,
+            //         'message' => 'Your subscription is active.',
+            //         'data' => $subscription
+            //     ], 200);
+            // }
 
-            // 🔹 Otherwise check trial
-            if ($subscription->trial_ends_at && now()->greaterThan($subscription->trial_ends_at)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Your trial period has ended.'
-                ], 403);
-            }
+            // // 🔹 Otherwise check trial
+            // if ($subscription->trial_ends_at && now()->greaterThan($subscription->trial_ends_at)) {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'Your trial period has ended.'
+            //     ], 403);
+            // }
 
             if (!$driveAccount->google_token) {
                 return response()->json([
@@ -175,7 +171,7 @@ class AlbumController extends Controller
 
             // Create Google Drive folder
             $folderMetadata = new Google_Service_Drive_DriveFile([
-                'name' => $request->input('google_drive_folder_name'),
+                'name' => $request->input('event_title'),
                 'mimeType' => 'application/vnd.google-apps.folder',
             ]);
 
@@ -185,7 +181,7 @@ class AlbumController extends Controller
             // Make folder public (optional)
             $this->makeFolderPublic($folderId);
 
-            $folderId = 'asd12dd12ds122s12';
+            // $folderId = 'asd12dd12ds122s12';
             // Save Album in a transaction
             $album = DB::transaction(function () use ($user, $request, $folderId) {
                 return Album::create([
@@ -195,11 +191,7 @@ class AlbumController extends Controller
                     'event_time' => $request->input('event_time') ?? null,
                     'location' => $request->input('location') ?? null,
                     'event_description' => $request->input('event_description') ?? null,
-                    'max_photos_per_guest' => $request->input('max_photos_per_guest') ?? null,
-                    'custom_welcome_message' => $request->input('custom_welcome_message') ?? null,
-                    'privacy_level' => $request->input('privacy_level', 'private'), // default to private
-                    'allow_guest_uploads' => $request->input('allow_guest_uploads', true)  ?? null, // default true
-                    'google_drive_folder_name' => $request->input('google_drive_folder_name')  ?? null,
+                    // 'google_drive_folder_name' => $request->input('google_drive_folder_name')  ?? null,
                     'google_drive_folder_id' => $folderId  ?? null,
                     'event_date' => $request->input('event_date') ?? null,
                 ]);
@@ -208,7 +200,6 @@ class AlbumController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Album created successfully',
-                'data' => $album
             ], 201);
         } catch (\Exception $e) {
             Log::error('Album Create Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -265,20 +256,33 @@ class AlbumController extends Controller
                 ], 404);
             }
 
+            // Check if user Drive exists
+            $album = Album::where('user_id', $folder->user_id)->first();
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This user Drive does not exist on our server.'
+                ], 404);
+            }
+
             // Initialize Google Drive
-            $this->gClient->setAccessToken([
-                'access_token' => $user->google_token,
-                'refresh_token' => $user->google_refresh_token,
-                'expires_in' => $user->google_token_expires_in,
-                'created' => time(),
-            ]);
+            // $tokenArray = [
+            //     'access_token' => $ablum->google_token,
+            //     'refresh_token' => $ablum->google_refresh_token,
+            //     'expires_in' => $ablum->google_token_expires_in,
+            //     'created' => time(),
+            //     'token_type' => 'Bearer',
+            // ];
+            $token = json_decode($album->json_token, true);
+            $this->gClient->setAccessToken($token);
+
             $service = new \Google_Service_Drive($this->gClient);
 
             // Refresh token if expired
             if ($this->gClient->isAccessTokenExpired()) {
-                if ($user->google_refresh_token) {
-                    $newToken = $this->gClient->fetchAccessTokenWithRefreshToken($user->google_refresh_token);
-                    $user->update([
+                if ($album->google_refresh_token) {
+                    $newToken = $this->gClient->fetchAccessTokenWithRefreshToken($album->google_refresh_token);
+                    $album->update([
                         'google_token' => $newToken['access_token'],
                         'google_token_expires_in' => $newToken['expires_in'],
                     ]);
@@ -292,6 +296,7 @@ class AlbumController extends Controller
 
             // Upload each file
             $uploadedFiles = [];
+            $filesCount = 0;
 
             $files = $request->file('uploaded_files');
 
@@ -326,29 +331,28 @@ class AlbumController extends Controller
                         'name' => $uploaded->name,
                         'link' => $uploaded->webViewLink,
                     ];
+                    $filesCount++;
                 } catch (\Exception $e) {
                     \Log::error('Google Drive upload failed: ' . $e->getMessage());
                     dump('Error uploading ' . $file->getClientOriginalName() . ' : ' . $e->getMessage());
                 }
             }
 
+            $folder->total_files = $folder->total_files + count($uploadedFiles);
+            $folder->save();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Files uploaded successfully',
-                'files' => $uploadedFiles
+                'files' => $uploadedFiles,
+                'total_files' => $filesCount,
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'File upload failed',
+                'message' => 'File upload failed' . $e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 }
-
-
-
-
-

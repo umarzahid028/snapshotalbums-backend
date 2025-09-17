@@ -19,6 +19,7 @@ class DriveAccount extends Model
         'google_refresh_token',
         'google_token_expires_in',
         'access_token',
+        'json_token',
     ];
 
     public function user()

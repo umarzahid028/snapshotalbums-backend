@@ -37,11 +37,20 @@ class Album extends Model
     public static function generateQrCode($album): string
     {
         $titlePart = strtoupper(substr(preg_replace('/\s+/', '', $album->event_title), 0, 3));
-
-        $typePart = strtoupper(substr(preg_replace('/\s+/', '', $album->event_type ?? 'EV'), 0, 2));
-
+        $typePart  = strtoupper(substr(preg_replace('/\s+/', '', $album->event_type ?? 'EV'), 0, 2));
         $uniqueNumber = random_int(1000, 9999);
 
-        return $titlePart . $typePart .'-'. $uniqueNumber;
+        return $titlePart . $typePart . '-' . $uniqueNumber;
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($album) {
+            if (empty($album->qrCode)) {
+                $album->qrCode = self::generateQrCode($album);
+            }
+        });
     }
 }
