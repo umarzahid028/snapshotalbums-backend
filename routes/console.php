@@ -10,4 +10,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 
-Schedule::command('app:activate-albums')->dailyAt('00:10');
+// Schedule::command('app:activate-albums')->dailyAt('00:10');

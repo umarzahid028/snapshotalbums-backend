@@ -54,6 +54,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/albums/list', [UserAlbumController::class, 'list']);
 
         Route::post('/upload/file', [UserAlbumController::class, 'upload']);
+        Route::post('/drive/file', [UserAlbumController::class, 'get_file']);
     });
 
     Route::prefix('admin')->group(function () {

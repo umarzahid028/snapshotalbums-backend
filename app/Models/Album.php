@@ -13,7 +13,6 @@ class Album extends Model
         'user_id',
         'event_title',
         'event_type',
-        'event_time',
         'location',
         'event_description',
         'max_photos_per_guest',

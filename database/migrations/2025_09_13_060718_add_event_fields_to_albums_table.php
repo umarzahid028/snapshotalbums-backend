@@ -14,14 +14,13 @@ return new class extends Migration
         Schema::table('albums', function (Blueprint $table) {
             $table->string('qrCode')->nullable()->after('event_title'); 
             $table->string('event_type')->nullable()->after('qrCode'); 
-            $table->dateTime('event_time')->nullable()->after('event_type'); // Event Time
-            $table->string('location')->nullable()->after('event_time'); // Location
+            $table->string('location')->nullable()->after('event_type'); // Location
             $table->text('event_description')->nullable()->after('location'); // Event Description
             $table->integer('max_photos_per_guest')->nullable()->after('event_description'); // Max Photos per Guest
             $table->text('custom_welcome_message')->nullable()->after('max_photos_per_guest'); // Custom Welcome Message
             $table->enum('privacy_level', ['private', 'public'])->default('private')->after('custom_welcome_message'); // Privacy Level
             $table->boolean('allow_guest_uploads')->default(true)->after('privacy_level'); // Allow Guest Uploads
-            $table->string('status')->default('pending')->after('privacy_level'); 
+            $table->string('status')->default('active')->after('privacy_level'); 
         });
     }
 

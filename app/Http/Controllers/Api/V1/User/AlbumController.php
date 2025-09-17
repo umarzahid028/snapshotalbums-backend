@@ -16,6 +16,8 @@ use Google_Service_Drive;
 use Google_Service_Drive_DriveFile;
 use Google_Service_Drive_Permission;
 use App\Http\Resources\AlbumResource;
+use Illuminate\Support\Facades\Http;
+use Google\Client as GoogleClient;
 
 
 class AlbumController extends Controller
@@ -66,7 +68,6 @@ class AlbumController extends Controller
         $request->validate([
             'event_title' => 'required|string|max:255',
             'event_type' => 'nullable|string|max:255',
-            'event_time' => 'nullable|date_format:Y-m-d H:i:s',
             'location' => 'nullable|string|max:255',
             'event_description' => 'nullable|string',
             // 'google_drive_folder_name' => 'required|string|max:255',
@@ -188,7 +189,6 @@ class AlbumController extends Controller
                     'user_id' => $user->id,
                     'event_title' => $request->input('event_title') ?? null,
                     'event_type' => $request->input('event_type') ?? null,
-                    'event_time' => $request->input('event_time') ?? null,
                     'location' => $request->input('location') ?? null,
                     'event_description' => $request->input('event_description') ?? null,
                     // 'google_drive_folder_name' => $request->input('google_drive_folder_name')  ?? null,
@@ -257,7 +257,7 @@ class AlbumController extends Controller
             }
 
             // Check if user Drive exists
-            $album = DriveAccount::where('user_id', $folder->user_id)->first();
+            $driveAccount = DriveAccount::where('user_id', $folder->user_id)->first();
             if (!$user) {
                 return response()->json([
                     'success' => false,
@@ -273,16 +273,16 @@ class AlbumController extends Controller
             //     'created' => time(),
             //     'token_type' => 'Bearer',
             // ];
-            $token = json_decode($album->json_token, true);
+            $token = json_decode($driveAccount->json_token, true);
             $this->gClient->setAccessToken($token);
 
             $service = new \Google_Service_Drive($this->gClient);
 
             // Refresh token if expired
             if ($this->gClient->isAccessTokenExpired()) {
-                if ($album->google_refresh_token) {
-                    $newToken = $this->gClient->fetchAccessTokenWithRefreshToken($album->google_refresh_token);
-                    $album->update([
+                if ($driveAccount->google_refresh_token) {
+                    $newToken = $this->gClient->fetchAccessTokenWithRefreshToken($driveAccount->google_refresh_token);
+                    $driveAccount->update([
                         'google_token' => $newToken['access_token'],
                         'google_token_expires_in' => $newToken['expires_in'],
                     ]);
@@ -350,6 +350,100 @@ class AlbumController extends Controller
                 'success' => false,
                 'message' => 'File upload failed' . $e->getMessage(),
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function get_file(Request $request)
+    {
+        try {
+            $folderId = $request->input('folder_id');
+
+            $folder = Album::where('google_drive_folder_id', $folderId)->first();
+            if (!$folder) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This folder does not exist on our server.'
+                ], 404);
+            }
+
+            // ✅ Check if user exists
+            $user = User::find($folder->user_id);
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This user does not exist on our server.'
+                ], 404);
+            }
+
+            // ✅ Check if Drive account exists
+            $driveAccount = DriveAccount::where('user_id', $folder->user_id)->first();
+            if (!$driveAccount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This user Drive does not exist on our server.'
+                ], 404);
+            }
+
+            // ✅ Load token
+            $token = json_decode($driveAccount->json_token, true);
+            $this->gClient->setAccessToken($token);
+
+            // ✅ Refresh if expired
+            if ($this->gClient->isAccessTokenExpired()) {
+                if ($driveAccount->google_refresh_token) {
+                    $newToken = $this->gClient->fetchAccessTokenWithRefreshToken($driveAccount->google_refresh_token);
+
+                    $newToken['refresh_token'] = $driveAccount->google_refresh_token; // keep refresh
+                    $newToken['created'] = time();
+
+                    // Save new token
+                    $driveAccount->update([
+                        'json_token'               => json_encode($newToken),
+                        'google_token'             => $newToken['access_token'],
+                        'google_refresh_token'     => $newToken['refresh_token'],
+                        'google_token_expires_in'  => $newToken['expires_in'],
+                    ]);
+
+                    $this->gClient->setAccessToken($newToken);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Access token expired and no refresh token available.'
+                    ], 401);
+                }
+            }
+
+            // ✅ Call Drive API
+            $service = new \Google_Service_Drive($this->gClient);
+
+            $files = $service->files->listFiles([
+                'q' => "'$folderId' in parents and trashed = false",
+                'fields' => 'files(id, name, webViewLink, webContentLink)',
+            ]);
+
+            // ✅ Extract only links
+            $links = [];
+            foreach ($files->getFiles() as $file) {
+                $links[] = [
+                    'id'   => $file->getId(),
+                    'name' => $file->getName(),
+                    'view' => $file->getWebViewLink(),
+                    'download' => $file->getWebContentLink(),
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'files'   => $links,
+                // 'event'   => $folder,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while fetching files.',
+                'error'   => $e->getMessage()
             ], 500);
         }
     }
