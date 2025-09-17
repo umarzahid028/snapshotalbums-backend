@@ -255,116 +255,124 @@ class AuthController extends Controller
 
     public function token(Request $request)
     {
-        $code = $request->input('code');
-        $value = $request->input('value');
+        try {
+            $code = $request->input('code');
+            $value = $request->input('value');
 
-        if (!$code) {
-            return response()->json(['error' => 'No code provided'], 400);
-        }
+            if (!$code) {
+                return response()->json(['error' => 'No code provided'], 400);
+            }
 
-        $redirect = env('GOOGLE_REDIRECT_URI_LOGIN');
+            $redirect = env('GOOGLE_REDIRECT_URI_LOGIN');
 
-        if ($value === 'drive') {
-            $redirect = env('GOOGLE_REDIRECT_URI');
-        }
-        // Exchange code for access token
-        $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
-            'code' => $code,
-            'client_id' => env('GOOGLE_CLIENT_ID'),
-            'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-            'redirect_uri' => $redirect,
-            'grant_type' => 'authorization_code',
-        ]);
-
-        if ($response->failed()) {
-            return response()->json(['error' => 'Failed to get access token', 'details' => $response->body()], 500);
-        }
-
-        $tokenData = $response->json();
-        $accessToken = $tokenData['access_token'];
-
-        // Get user info from Google
-        $googleUserResponse = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $accessToken,
-        ])->get('https://www.googleapis.com/oauth2/v2/userinfo');
-
-        if ($googleUserResponse->failed()) {
-            return response()->json(['error' => 'Failed to fetch Google user info'], 500);
-        }
-
-        $googleUser = (object) $googleUserResponse->json(); // convert array to object
-
-        // Check if user exists by Google ID or email
-        $user = User::Where('email', $googleUser->email)->orwhere('google_id', $googleUser->id)
-            ->first();
-
-        if ($user) {
-            $user->update([
-                'google_id' => $googleUser->id,
-                'avatar' => $googleUser->picture,
-                'google_token' => $accessToken,
-                'google_refresh_token' => $tokenData['refresh_token'] ?? null,
-                'google_token_expires_in' => $tokenData['expires_in'],
+            if ($value === 'drive') {
+                $redirect = env('GOOGLE_REDIRECT_URI');
+            }
+            // Exchange code for access token
+            $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
+                'code' => $code,
+                'client_id' => env('GOOGLE_CLIENT_ID'),
+                'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+                'redirect_uri' => $redirect,
+                'grant_type' => 'authorization_code',
             ]);
-        } else {
-            if ($value == 'login') {
-                $user = User::create([
-                    'name' => $googleUser->name,
-                    'email' => $googleUser->email,
+
+            if ($response->failed()) {
+                return response()->json(['error' => 'Failed to get access token', 'details' => $response->body()], 500);
+            }
+
+            $tokenData = $response->json();
+            $accessToken = $tokenData['access_token'];
+
+            // Get user info from Google
+            $googleUserResponse = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $accessToken,
+            ])->get('https://www.googleapis.com/oauth2/v2/userinfo');
+
+            if ($googleUserResponse->failed()) {
+                return response()->json(['error' => 'Failed to fetch Google user info'], 500);
+            }
+
+            $googleUser = (object) $googleUserResponse->json(); // convert array to object
+
+            // Check if user exists by Google ID or email
+            $user = User::Where('email', $googleUser->email)->orwhere('google_id', $googleUser->id)
+                ->first();
+
+            if ($user) {
+                $user->update([
                     'google_id' => $googleUser->id,
                     'avatar' => $googleUser->picture,
-                    'password' => bcrypt(Str::random(16)),
                     'google_token' => $accessToken,
                     'google_refresh_token' => $tokenData['refresh_token'] ?? null,
                     'google_token_expires_in' => $tokenData['expires_in'],
                 ]);
+            } else {
+                if ($value == 'login') {
+                    $user = User::create([
+                        'name' => $googleUser->name,
+                        'email' => $googleUser->email,
+                        'google_id' => $googleUser->id,
+                        'avatar' => $googleUser->picture,
+                        'password' => bcrypt(Str::random(16)),
+                        'google_token' => $accessToken,
+                        'google_refresh_token' => $tokenData['refresh_token'] ?? null,
+                        'google_token_expires_in' => $tokenData['expires_in'],
+                    ]);
+                }
             }
-        }
 
-        $driveAccount = [];
-        if ($value == 'drive' && $user ) {
-            $jsonToken = $tokenData;
-            $jsonToken['created'] = time();
-            $driveAccount = DriveAccount::updateOrCreate(
-                [
-                    'user_id' => $user->id,
-                    'drive_email' => $googleUser->email,
+            $driveAccount = [];
+            if ($value == 'drive' && $user) {
+                $jsonToken = $tokenData;
+                $jsonToken['created'] = time();
+                $driveAccount = DriveAccount::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'drive_email' => $googleUser->email,
+                    ],
+                    [
+                        'drive_name' => $googleUser->name,
+                        'google_id' => $googleUser->id,
+                        'avatar' => $googleUser->picture,
+                        'google_token' => $accessToken,
+                        'google_refresh_token' => $tokenData['refresh_token'] ?? null,
+                        'google_token_expires_in' => $tokenData['expires_in'],
+                        'access_token' => $accessToken,
+                        'json_token' => json_encode($jsonToken),
+                    ]
+                );
+            }
+
+            $authToken = $user->createToken('bazzre-auth')->plainTextToken;
+
+            return response()->json([
+                'user' => [
+                    'name'   => $user->name,
+                    'email'  => $user->email,
+                    'avatar' => $user->avatar,
                 ],
-                [
-                    'drive_name' => $googleUser->name,
-                    'google_id' => $googleUser->id,
-                    'avatar' => $googleUser->picture,
-                    'google_token' => $accessToken,
-                    'google_refresh_token' => $tokenData['refresh_token'] ?? null,
-                    'google_token_expires_in' => $tokenData['expires_in'],
-                    'access_token' => $accessToken,
-                    'json_token' => json_encode($jsonToken),
-                ]
-            );
+                'driveAccount' => $driveAccount ? [
+                    'drive_name'  => $driveAccount->drive_name,
+                    'drive_email' => $driveAccount->drive_email,
+                    'avatar'      => $driveAccount->avatar,
+                ] : null,
+                'bazzreToken' => $authToken,
+                'tokenData' => $tokenData,
+            ]);
+
+            // return response()->json([
+            //     'user' => $user,
+            //     'driveAccount' => $driveAccount,
+            //     'tokenData' => $tokenData,
+            //     'bazzreToken' => $authToken,
+            // ]);
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Google login failed: ' . $e->getMessage(),
+            ], 500);
         }
-
-        $authToken = $user->createToken('bazzre-auth')->plainTextToken;
-
-        return response()->json([
-            'user' => [
-                'name'   => $user->name,
-                'email'  => $user->email,
-                'avatar' => $user->avatar,
-            ],
-            'driveAccount' => $driveAccount ? [
-                'drive_name'  => $driveAccount->drive_name,
-                'drive_email' => $driveAccount->drive_email,
-                'avatar'      => $driveAccount->avatar,
-            ] : null,
-            'bazzreToken' => $authToken,
-            'tokenData' => $tokenData,
-        ]);
-
-        // return response()->json([
-        //     'user' => $user,
-        //     'driveAccount' => $driveAccount,
-        //     'tokenData' => $tokenData,
-        //     'bazzreToken' => $authToken,
-        // ]);
     }
 }
