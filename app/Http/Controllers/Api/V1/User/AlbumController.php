@@ -257,7 +257,7 @@ class AlbumController extends Controller
             }
 
             // Check if user Drive exists
-            $album = Album::where('user_id', $folder->user_id)->first();
+            $album = DriveAccount::where('user_id', $folder->user_id)->first();
             if (!$user) {
                 return response()->json([
                     'success' => false,
@@ -307,8 +307,6 @@ class AlbumController extends Controller
 
             foreach ($files as $file) {
                 try {
-                    dump('Processing file: ' . $file->getClientOriginalName());
-
                     $mimeType = $file->getClientMimeType() ?? mime_content_type($file->getRealPath());
 
                     $fileMetadata = new \Google_Service_Drive_DriveFile([
