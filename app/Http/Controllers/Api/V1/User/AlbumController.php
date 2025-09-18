@@ -81,47 +81,47 @@ class AlbumController extends Controller
             $driveAccount = DriveAccount::where('user_id', $user->id)->latest()->first();
             $subscription = UserSubscription::where('user_id', $user->id)->latest()->first();
 
-            // if (!$subscription) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'No subscription found.'
-            //     ], 404);
-            // }
+            if (!$subscription) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No subscription found.'
+                ], 404);
+            }
 
-            // if (!$driveAccount) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'Please connect the drive account.'
-            //     ], 404);
-            // }
+            if (!$driveAccount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please connect the drive account.'
+                ], 404);
+            }
 
-            // if ($subscription && $checkAlbumCount > $subscription->plan_no_of_albums) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'You have reached the maximum number of albums allowed for your plan.'
-            //     ], 403);
-            // }
+            if ($subscription && $checkAlbumCount > $subscription->plan_no_of_albums) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You have reached the maximum number of albums allowed for your plan.'
+                ], 403);
+            }
 
-            // // 🔹 Check active paid subscription
-            // if (
-            //     $subscription->transaction_id &&
-            //     $subscription->status === 'active' &&
-            //     $subscription->transaction_status === 'succeeded'
-            // ) {
-            //     return response()->json([
-            //         'success' => true,
-            //         'message' => 'Your subscription is active.',
-            //         'data' => $subscription
-            //     ], 200);
-            // }
+            // 🔹 Check active paid subscription
+            if (
+                $subscription->transaction_id &&
+                $subscription->status === 'active' &&
+                $subscription->transaction_status === 'succeeded'
+            ) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Your subscription is active.',
+                    'data' => $subscription
+                ], 200);
+            }
 
-            // // 🔹 Otherwise check trial
-            // if ($subscription->trial_ends_at && now()->greaterThan($subscription->trial_ends_at)) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'Your trial period has ended.'
-            //     ], 403);
-            // }
+            // 🔹 Otherwise check trial
+            if ($subscription->trial_ends_at && now()->greaterThan($subscription->trial_ends_at)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your trial period has ended.'
+                ], 403);
+            }
 
             if (!$driveAccount->google_token) {
                 return response()->json([

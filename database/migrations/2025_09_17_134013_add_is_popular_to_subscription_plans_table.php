@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('subscription_plans', function (Blueprint $table) {
             $table->boolean('is_popular')->default(false)->after('price');
+            $table->text('description')->nullable()->after('slug');
         });
     }
 
@@ -20,6 +21,7 @@ return new class extends Migration
     {
         Schema::table('subscription_plans', function (Blueprint $table) {
             $table->dropColumn('is_popular');
+            $table->dropColumn('description');
         });
     }
 };

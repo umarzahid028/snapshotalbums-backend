@@ -43,7 +43,7 @@ class SubscriptionPlanController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:subscription_plans,name',
-            'slug' => 'nullable|string|unique:subscription_plans,slug',
+            'description' => 'nullable|string|unique:subscription_plans,slug',
             'no_of_ablums' => 'required|numeric|min:1',
             'price' => 'required|numeric|min:0',
             'duration_days' => 'required|integer|min:1',
@@ -56,6 +56,7 @@ class SubscriptionPlanController extends Controller
             $plan = DB::transaction(function () use ($request) {
                 return SubscriptionPlan::create($request->only(
                     'name',
+                    'description',
                     'price',
                     'duration_days',
                     'features',
@@ -80,7 +81,7 @@ class SubscriptionPlanController extends Controller
 
         $request->validate([
             'name' => 'sometimes|required|string|max:255|unique:subscription_plans,name,' . $plan->id,
-            'slug' => 'sometimes|nullable|string',
+            'description' => 'sometimes|nullable|string',
             'no_of_ablums' => 'sometimes|required|numeric|min:1',
             'price' => 'sometimes|required|numeric|min:0',
             'duration_days' => 'sometimes|required|integer|min:1',
@@ -92,7 +93,7 @@ class SubscriptionPlanController extends Controller
 
         try {
             DB::transaction(function () use ($plan, $request) {
-                $plan->update($request->only('name', 'slug', 'price', 'no_of_ablums', 'duration_days', 'features', 'is_active', 'is_popular'));
+                $plan->update($request->only('name', 'description', 'price', 'no_of_ablums', 'duration_days', 'features', 'is_active', 'is_popular'));
             });
 
             return new SubscriptionPlanResource($plan);
@@ -119,7 +120,7 @@ class SubscriptionPlanController extends Controller
                 'id' => $plan->id,
                 'is_active' => $plan->is_active,
             ], 200);
-            
+
         } catch (\Exception $e) {
             Log::error('Subscription Plan Update Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['message' => 'Failed to update plan', 'error' => $e->getMessage()], 500);

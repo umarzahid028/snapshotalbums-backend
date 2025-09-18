@@ -42,55 +42,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Handle Google callback.
-     */
-    public function handleGoogleCallback(Request $request)
-    {
-        try {
-            $googleUser = Socialite::driver('google')->stateless()->user();
-
-            // Find user by email OR google_id
-            $user = User::where('google_id', $googleUser->getId())->orWhere('drive_email', $googleUser->getEmail())->first();
-
-            if ($user) {
-                $user->update([
-                    'google_id'              => $googleUser->getId(),
-                    'avatar'                 => $googleUser->getAvatar(),
-                    'google_token'           => $googleUser->token,
-                    'google_refresh_token'   => $googleUser->refreshToken,
-                    'google_token_expires_in' => $googleUser->expiresIn,
-                ]);
-            } else {
-                $user = User::create([
-                    'name'                   => $googleUser->getName(),
-                    'email'                  => $googleUser->getEmail(),
-                    'google_id'              => $googleUser->getId(),
-                    'avatar'                 => $googleUser->getAvatar(),
-                    'password'               => bcrypt(Str::random(16)),
-                    'google_token'           => $googleUser->token,
-                    'google_refresh_token'   => $googleUser->refreshToken,
-                    'google_token_expires_in' => $googleUser->expiresIn,
-                ]);
-            }
-
-            // Generate Sanctum token
-            $token = $user->createToken('api-token')->plainTextToken;
-
-            // Sirf safe data redirect me bhejo
-            $safeUser = [
-                'id'    => $user->id,
-                'name'  => $user->name,
-                'email' => $user->email,
-                'avatar' => $user->avatar,
-            ];
-
-            return redirect("http://localhost:5173/google/callback?success=true&token=$token&user=" . urlencode(json_encode($safeUser)));
-        } catch (\Exception $e) {
-            return redirect("http://localhost:5173/google/callback?success=false&error=" . urlencode($e->getMessage()));
-        }
-    }
-
 
     // Connect Google
     public function connectGoogleDrive()
@@ -116,55 +67,6 @@ class AuthController extends Controller
         ]);
     }
 
-    // public function handleConnectGoogleDriveCallback(Request $request)
-    // {
-    //     try {
-    //         $googleUser = Socialite::driver('google')->stateless()->user();
-
-    //         // $user = Auth::user();
-
-    //         // if (!$user) {
-    //         //     return response()->json([
-    //         //         'success' => false,
-    //         //         'message' => 'Unauthorized',
-    //         //     ], 401);
-    //         // }
-
-    //         // Create or update drive account for this user
-    //         $driveAccount = DriveAccount::updateOrCreate(
-    //             [
-    //                 'user_id'     => '9',
-    //                 'drive_email' => $googleUser->getEmail(),
-    //             ],
-    //             [
-    //                 'drive_name'             => $googleUser->getName(),
-    //                 'google_id'              => $googleUser->getId(),
-    //                 'avatar'                 => $googleUser->getAvatar(),
-    //                 'google_token'           => $googleUser->token,
-    //                 'google_refresh_token'   => $googleUser->refreshToken,
-    //                 'google_token_expires_in' => $googleUser->expiresIn,
-    //                 'access_token'           => $googleUser->token,
-    //             ]
-    //         );
-
-    //         // return response()->json([
-    //         //     'success' => true,
-    //         //     'message' => 'Google Drive connected successfully',
-    //         //     'data'    => $driveAccount,
-    //         // ]);
-
-    //         return redirect("http://localhost:5173/google/callback?drive_connected=true&drive_token=$token&user=" . urlencode(json_encode($safeUser)));
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Google Drive connection failed: ' . $e->getMessage(),
-    //         ], 500);
-    //         return redirect("http://localhost:5173/google/callback?success=false&error=" . urlencode($e->getMessage()));
-    //     }
-    // }
-
-
-
     public function register(Request $request)
     {
         $data = $request->validate([
@@ -181,7 +83,13 @@ class AuthController extends Controller
 
         $token = $user->createToken('api-token')->plainTextToken;
 
-        return response()->json(['user' => $user, 'token' => $token], 201);
+        return response()->json([
+        'user' => [
+            'id'   => $user->id,
+            'name'   => $user->name,
+            'email'  => $user->email,
+        ],
+        'token' => $token], 201);
     }
 
     // Login
@@ -202,7 +110,13 @@ class AuthController extends Controller
 
         $token = $user->createToken('api-token')->plainTextToken;
 
-        return response()->json(['user' => $user, 'token' => $token]);
+        return response()->json([
+        'user' => [
+            'id'   => $user->id,
+            'name'   => $user->name,
+            'email'  => $user->email,
+        ], 
+        'token' => $token]);
     }
 
     // Logout
@@ -348,6 +262,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'user' => [
+                    'id'   => $user->id,
                     'name'   => $user->name,
                     'email'  => $user->email,
                     'avatar' => $user->avatar,

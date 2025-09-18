@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\User\BlogController as UserBlogController;
 use App\Http\Controllers\Api\V1\User\FaqController as UserFaqController;
 use App\Http\Controllers\Api\V1\User\AlbumController as UserAlbumController;
 use App\Http\Controllers\Api\V1\User\DashboardController as UserDashboardController;
+use App\Http\Controllers\Api\V1\User\SubscriptionPlanController as UserSubscriptionPlanController;
 
 use App\Http\Controllers\Api\V1\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Api\V1\Admin\AuthController as AdminAuthController;
@@ -34,6 +35,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/blogs/{slug}', [UserBlogController::class, 'show']);
 
     Route::get('/faqs', [UserFaqController::class, 'index']);
+
+    Route::get('/plan', [UserSubscriptionPlanController::class, 'index']);
 
     Route::post('/get-token', [UserAuthController::class, 'token']);
 
