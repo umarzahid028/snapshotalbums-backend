@@ -19,10 +19,11 @@ class SubscriptionPlanResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'price' => $this->price,
-            'No of Ablums' => $this->no_of_ablums,
+            'no_of_ablums' => $this->no_of_ablums,
             'duration_days' => $this->duration_days,
             'features' => $this->features,
             'is_active' => $this->is_active,
+            'is_popular' => $this->is_popular,
         ];
     }
 }

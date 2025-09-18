@@ -19,21 +19,21 @@ class SubscriptionPlanController extends Controller
             $plans = SubscriptionPlan::latest()->get();
             return SubscriptionPlanResource::collection($plans);
         } catch (\Exception $e) {
-            Log::error('Subscription Plan Index Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('Subscription Plan Index Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['message' => 'Failed to fetch plans', 'error' => $e->getMessage()], 500);
         }
     }
 
     // Show single plan
-    public function show($slug)
+    public function show($id)
     {
         try {
-            $plan = SubscriptionPlan::where('slug', $slug)->firstOrFail();
+            $plan = SubscriptionPlan::find($id);
             return new SubscriptionPlanResource($plan);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['message' => 'Plan not found'], 404);
         } catch (\Exception $e) {
-            Log::error('Subscription Plan Show Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('Subscription Plan Show Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['message' => 'Failed to fetch plan', 'error' => $e->getMessage()], 500);
         }
     }
@@ -49,58 +49,88 @@ class SubscriptionPlanController extends Controller
             'duration_days' => 'required|integer|min:1',
             'features' => 'nullable|array',
             'is_active' => 'nullable|boolean',
+            'is_popular' => 'nullable|boolean',
         ]);
 
         try {
             $plan = DB::transaction(function () use ($request) {
-                $slug = $request->slug ?? Str::slug($request->name);
-                return SubscriptionPlan::create(array_merge(
-                    $request->only('name', 'price', 'duration_days', 'features', 'is_active', 'no_of_ablums'),
-                    ['slug' => $slug]
+                return SubscriptionPlan::create($request->only(
+                    'name',
+                    'price',
+                    'duration_days',
+                    'features',
+                    'is_active',
+                    'no_of_ablums',
+                    'is_popular'
                 ));
             });
 
+
             return new SubscriptionPlanResource($plan);
         } catch (\Exception $e) {
-            Log::error('Subscription Plan Store Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('Subscription Plan Store Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['message' => 'Failed to create plan', 'error' => $e->getMessage()], 500);
         }
     }
 
     // Update plan
-    public function update(Request $request, $slug)
+    public function update(Request $request, $id)
     {
-        $plan = SubscriptionPlan::where('slug', $slug)->firstOrFail();
+        $plan = SubscriptionPlan::find($id);
 
         $request->validate([
-            'name' => 'sometimes|required|string|max:255|unique:subscription_plans,name,'.$plan->id,
-            'slug' => 'sometimes|nullable|string|unique:subscription_plans,slug,'.$plan->id,
+            'name' => 'sometimes|required|string|max:255|unique:subscription_plans,name,' . $plan->id,
+            'slug' => 'sometimes|nullable|string',
             'no_of_ablums' => 'sometimes|required|numeric|min:1',
             'price' => 'sometimes|required|numeric|min:0',
             'duration_days' => 'sometimes|required|integer|min:1',
             'features' => 'nullable|array',
+            'features.*' => 'string',
+            'is_active' => 'nullable|boolean',
+            'is_popular' => 'nullable|boolean',
+        ]);
+
+        try {
+            DB::transaction(function () use ($plan, $request) {
+                $plan->update($request->only('name', 'slug', 'price', 'no_of_ablums', 'duration_days', 'features', 'is_active', 'is_popular'));
+            });
+
+            return new SubscriptionPlanResource($plan);
+        } catch (\Exception $e) {
+            Log::error('Subscription Plan Update Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json(['message' => 'Failed to update plan', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function update_status(Request $request, $id)
+    {
+        $plan = SubscriptionPlan::find($id);
+
+        $request->validate([
             'is_active' => 'nullable|boolean',
         ]);
 
         try {
             DB::transaction(function () use ($plan, $request) {
-                if ($request->filled('name') && !$request->filled('slug')) {
-                    $request->merge(['slug' => Str::slug($request->name)]);
-                }
-                $plan->update($request->only('name','slug','price','duration_days','features','is_active'));
+                $plan->update($request->only('is_active'));
             });
 
-            return new SubscriptionPlanResource($plan);
+            return response()->json([
+                'id' => $plan->id,
+                'is_active' => $plan->is_active,
+            ], 200);
+            
         } catch (\Exception $e) {
-            Log::error('Subscription Plan Update Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('Subscription Plan Update Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['message' => 'Failed to update plan', 'error' => $e->getMessage()], 500);
         }
     }
 
+
     // Delete plan
-    public function destroy($slug)
+    public function destroy($id)
     {
-        $plan = SubscriptionPlan::where('slug', $slug)->firstOrFail();
+        $plan = SubscriptionPlan::find($id);
 
         try {
             DB::transaction(function () use ($plan) {
@@ -109,7 +139,7 @@ class SubscriptionPlanController extends Controller
 
             return response()->json(['message' => 'Plan deleted successfully'], 200);
         } catch (\Exception $e) {
-            Log::error('Subscription Plan Delete Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('Subscription Plan Delete Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['message' => 'Failed to delete plan', 'error' => $e->getMessage()], 500);
         }
     }

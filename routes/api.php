@@ -37,6 +37,9 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/get-token', [UserAuthController::class, 'token']);
 
+    // Upload File
+    Route::post('/upload/file', [UserAlbumController::class, 'upload']);
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [UserAuthController::class, 'logout']);
         
@@ -53,7 +56,6 @@ Route::prefix('v1')->group(function () {
         Route::post('/albums', [UserAlbumController::class, 'create']);
         Route::get('/albums/list', [UserAlbumController::class, 'list']);
 
-        Route::post('/upload/file', [UserAlbumController::class, 'upload']);
         Route::post('/drive/file', [UserAlbumController::class, 'get_file']);
     });
 
@@ -84,10 +86,11 @@ Route::prefix('v1')->group(function () {
             Route::delete('/faqs/{id}', [AdminFaqController::class, 'destroy']);
 
             Route::get('/plans', [AdminSubscriptionPlanController::class, 'index']);
-            Route::get('/plans/{slug}', [AdminSubscriptionPlanController::class, 'show']);
             Route::post('/plans', [AdminSubscriptionPlanController::class, 'store']);
-            Route::put('/plans/{slug}', [AdminSubscriptionPlanController::class, 'update']);
-            Route::delete('/plans/{slug}', [AdminSubscriptionPlanController::class, 'destroy']);
+            Route::get('/plans/{id}', [AdminSubscriptionPlanController::class, 'show']);
+            Route::put('/plans/{id}', [AdminSubscriptionPlanController::class, 'update']);
+            Route::put('/plans/status-update/{id}', [AdminSubscriptionPlanController::class, 'update_status']);
+            Route::delete('/plans/{id}', [AdminSubscriptionPlanController::class, 'destroy']);
         });
     });
 
