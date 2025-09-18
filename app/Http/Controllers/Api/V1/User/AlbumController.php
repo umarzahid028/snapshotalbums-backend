@@ -296,7 +296,6 @@ class AlbumController extends Controller
 
             // Upload each file
             $uploadedFiles = [];
-            $filesCount = 0;
 
             $files = $request->file('uploaded_files');
 
@@ -329,21 +328,45 @@ class AlbumController extends Controller
                         'name' => $uploaded->name,
                         'link' => $uploaded->webViewLink,
                     ];
-                    $filesCount++;
                 } catch (\Exception $e) {
                     \Log::error('Google Drive upload failed: ' . $e->getMessage());
                     dump('Error uploading ' . $file->getClientOriginalName() . ' : ' . $e->getMessage());
                 }
             }
 
-            $folder->total_files = $folder->total_files + count($uploadedFiles);
+            $about = $service->about->get(['fields' => 'storageQuota']);
+            $storage = $about->getStorageQuota();
+            $totalStorageBytes = $storage->getLimit();
+            $usedStorageBytes  = $storage->getUsage();
+
+            // Convert bytes to GB
+            $totalStorageGB = $totalStorageBytes / 1024 / 1024 / 1024;
+            $usedStorageGB  = $usedStorageBytes / 1024 / 1024 / 1024;
+
+            // Optional: round to 2 decimal places
+            $totalStorageGB = round($totalStorageGB, 2);
+            $usedStorageGB  = round($usedStorageGB, 2);
+
+            $driveAccount->drive_storage = $totalStorageGB;
+            $driveAccount->used_storage = $usedStorageGB;
+            $driveAccount->save();
+
+
+            $files = $service->files->listFiles([
+                'q' => "'$request->folder_id' in parents and trashed = false",
+                'fields' => 'files(id, name, webViewLink, webContentLink)',
+            ]);
+
+            $totalFilesInFolder = count($files->getFiles());
+
+            $folder->total_files = $totalFilesInFolder;
             $folder->save();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Files uploaded successfully',
                 'files' => $uploadedFiles,
-                'total_files' => $filesCount,
+                'total_files' => $folder->total_files ?? '',
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -423,6 +446,11 @@ class AlbumController extends Controller
                 'fields' => 'files(id, name, webViewLink, webContentLink)',
             ]);
 
+            $totalFilesInFolder = count($files->getFiles());
+
+            $folder->total_files = $totalFilesInFolder;
+            $folder->save();
+
             // ✅ Extract only links
             $links = [];
             foreach ($files->getFiles() as $file) {
@@ -434,10 +462,27 @@ class AlbumController extends Controller
                 ];
             }
 
+            $about = $service->about->get(['fields' => 'storageQuota']);
+            $storage = $about->getStorageQuota();
+            $totalStorageBytes =  $storage->getLimit();
+            $usedStorageBytes =  $storage->getUsage();
+
+            // Convert bytes to GB
+            $totalStorageGB = $totalStorageBytes / 1024 / 1024 / 1024;
+            $usedStorageGB  = $usedStorageBytes / 1024 / 1024 / 1024;
+
+
+            $totalStorageGB = round($totalStorageGB, 2);
+            $usedStorageGB  = round($usedStorageGB, 2);
+
+            $driveAccount->drive_storage = $totalStorageGB;
+            $driveAccount->used_storage = $usedStorageGB;
+            $driveAccount->save();
+
+
             return response()->json([
                 'success' => true,
                 'files'   => $links,
-                // 'event'   => $folder,
             ]);
         } catch (\Exception $e) {
             return response()->json([

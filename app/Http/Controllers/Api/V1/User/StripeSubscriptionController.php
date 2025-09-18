@@ -97,7 +97,7 @@ class StripeSubscriptionController extends Controller
                 try {
                     $existingSubscription = \Stripe\Subscription::retrieve($UserSubscription->transaction_id);
                     if ($existingSubscription->status === 'active' || $existingSubscription->status === 'trialing') {
-                        return response()->json(['error' => 'User already has an active subscription'], 400);
+                        return response()->json(['message' => 'User already has an active subscription'], 400);
                     }
                 } catch (\Exception $e) {
                     $user->transaction_id = null;
@@ -164,14 +164,14 @@ class StripeSubscriptionController extends Controller
             Log::error('Stripe API Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Stripe error',
+                'message' => 'Stripe error'.$e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         } catch (\Exception $e) {
             Log::error('User Subscribe Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to subscribe',
+                'message' => 'Failed to subscribe'.$e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }

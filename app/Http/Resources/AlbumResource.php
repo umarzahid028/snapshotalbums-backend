@@ -15,6 +15,7 @@ class AlbumResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id ?? null,
             'title' => $this->event_title ?? null,
             'type' => $this->event_type ?? null,
             'time' => $this->event_time ?? null,

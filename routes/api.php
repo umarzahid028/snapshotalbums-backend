@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Api\V1\Admin\FaqController as AdminFaqController;
 use App\Http\Controllers\Api\V1\Admin\SubscriptionPlanController as AdminSubscriptionPlanController;
 use App\Http\Controllers\Api\V1\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Api\V1\Admin\DriveAccountController as AdminDriveAccountController;
 
 
 Route::prefix('v1')->group(function () {
@@ -94,6 +95,8 @@ Route::prefix('v1')->group(function () {
             Route::put('/plans/{id}', [AdminSubscriptionPlanController::class, 'update']);
             Route::put('/plans/status-update/{id}', [AdminSubscriptionPlanController::class, 'update_status']);
             Route::delete('/plans/{id}', [AdminSubscriptionPlanController::class, 'destroy']);
+
+            Route::get('/google-drive', [AdminDriveAccountController::class, 'index']);
         });
     });
 
