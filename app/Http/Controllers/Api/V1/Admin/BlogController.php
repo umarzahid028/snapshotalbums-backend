@@ -16,8 +16,17 @@ class BlogController extends Controller
     public function index()
     {
         try {
-            $blogs = Blog::latest()->get();
-            return BlogResource::collection($blogs);
+            $blogs = Blog::latest()->paginate(10);
+            return BlogResource::collection($blogs)
+            ->additional([
+                'paginate' => [
+                    'current_page' => $blogs->currentPage(),
+                    'last_page' => $blogs->lastPage(),
+                    'per_page' => $blogs->perPage(),
+                    'total' => $blogs->total(),
+                ]
+            ]);
+
         } catch (\Exception $e) {
             Log::error('Blog Index Error: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to fetch blogs' . $e->getMessage()], 500);

@@ -11,17 +11,34 @@ use App\Http\Resources\FaqResource;
 
 class FaqController extends Controller
 {
-    // List all FAQs
-    public function index()
+
+    public function index(Request $request)
     {
         try {
-            $faqs = FAQ::latest()->get();
+
+            $perPage = $request->get('per_page', 7);
+            $search = $request->get('search');
+
+            $query = FAQ::query();
+
+            if ($search) {
+                $query->where('question', 'LIKE', "%$search%")
+                    ->orWhere('category', 'LIKE', "%$search%");
+            }
+
+            $faqs = $query->latest()->paginate($perPage);
+
             return FaqResource::collection($faqs);
         } catch (\Exception $e) {
-            Log::error('FAQ Index Error: '.$e->getMessage());
-            return response()->json(['error' => 'Failed to fetch FAQs'.$e->getMessage()], 500);
+            Log::error('FAQ Index Error: ' . $e->getMessage());
+
+            return response()->json([
+                'error' => 'Failed to fetch FAQs'
+            ], 500);
         }
     }
+
+
 
     // Show single FAQ
     public function show($id)
@@ -30,8 +47,8 @@ class FaqController extends Controller
             $faq = FAQ::findOrFail($id);
             return new FaqResource($faq);
         } catch (\Exception $e) {
-            Log::error('FAQ Show Error: '.$e->getMessage());
-            return response()->json(['error' => 'FAQ not found'.$e->getMessage()], 404);
+            Log::error('FAQ Show Error: ' . $e->getMessage());
+            return response()->json(['error' => 'FAQ not found' . $e->getMessage()], 404);
         }
     }
 
@@ -48,7 +65,7 @@ class FaqController extends Controller
 
         try {
             $faq = DB::transaction(function () use ($request) {
-                return FAQ::create($request->only('question', 'answer', 'is_active','category' ,'order'));
+                return FAQ::create($request->only('question', 'answer', 'is_active', 'category', 'order'));
             });
 
             return response()->json([
@@ -56,8 +73,8 @@ class FaqController extends Controller
                 'message' => 'Faq Store successfully',
             ], 200);
         } catch (\Exception $e) {
-            Log::error('FAQ Store Error: '.$e->getMessage());
-            return response()->json(['error' => 'Failed to create FAQ'.$e->getMessage()], 500);
+            Log::error('FAQ Store Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to create FAQ' . $e->getMessage()], 500);
         }
     }
 
@@ -76,7 +93,7 @@ class FaqController extends Controller
             $faq = FAQ::findOrFail($id);
 
             DB::transaction(function () use ($faq, $request) {
-                $faq->update($request->only('question', 'answer', 'is_active','category' ,'order'));
+                $faq->update($request->only('question', 'answer', 'is_active', 'category', 'order'));
             });
 
             return response()->json([
@@ -84,8 +101,8 @@ class FaqController extends Controller
                 'message' => 'Faq update successfully',
             ], 200);
         } catch (\Exception $e) {
-            Log::error('FAQ Update Error: '.$e->getMessage());
-            return response()->json(['error' => 'Failed to update FAQ'.$e->getMessage()], 500);
+            Log::error('FAQ Update Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to update FAQ' . $e->getMessage()], 500);
         }
     }
 
@@ -101,8 +118,8 @@ class FaqController extends Controller
 
             return response()->json(['message' => 'FAQ deleted successfully'], 200);
         } catch (\Exception $e) {
-            Log::error('FAQ Delete Error: '.$e->getMessage());
-            return response()->json(['error' => 'Failed to delete FAQ'.$e->getMessage()], 500);
+            Log::error('FAQ Delete Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to delete FAQ' . $e->getMessage()], 500);
         }
     }
 }

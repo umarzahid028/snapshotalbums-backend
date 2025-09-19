@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
 
 class UserController extends Controller
 {
@@ -34,10 +36,16 @@ class UserController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:6|confirmed',
+                'status' => 'nullable|boolean',
             ]);
 
             // Hash the password
             $validated['password'] = bcrypt($validated['password']);
+
+            // Convert status boolean to string
+            $validated['status'] = isset($validated['status'])
+                ? ($validated['status'] ? 'active' : 'inactive')
+                : 'inactive'; 
 
             $user = User::create($validated);
 
@@ -92,7 +100,8 @@ class UserController extends Controller
                 'email',
                 Rule::unique('users')->ignore($user->id),
             ],
-            'password' => 'nullable|string|min:6|confirmed', // password_confirmation must match
+            'password' => 'nullable|string|min:6|confirmed',
+            'status' => 'nullable|boolean',
         ];
 
         $validated = $request->validate($rules);
@@ -109,6 +118,11 @@ class UserController extends Controller
         // Update password only if provided
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
+        }
+
+        // Update status
+        if (isset($validated['status'])) {
+            $user->status = $validated['status'] ? 'active' : 'inactive';
         }
 
         $user->save();

@@ -12,14 +12,22 @@ class BlogResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-     public function toArray(Request $request): array
+    public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
             'title' => $this->title,
             'slug' => $this->slug,
             'description' => $this->description,
+            'excerpt' => $this->excerpt,
             'image' => $this->image,
+            'author' => [
+                'name' => $this->author,
+                'email' => $this->author_email,
+            ],
+            'status' => $this->status,
+            'category' => $this->category,
+            'tags' => $this->tags,
             'meta' => [
                 'title' => $this->meta_title,
                 'description' => $this->meta_description,

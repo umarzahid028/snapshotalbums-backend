@@ -48,6 +48,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/logout', [UserAuthController::class, 'logout']);
         
         Route::get('/user-dashboard', [UserDashboardController::class, 'index']);
+
+        Route::get('/user-profile', [UserDashboardController::class, 'profile']);
         
         Route::get('/user', [UserAuthController::class, 'user']);
 
