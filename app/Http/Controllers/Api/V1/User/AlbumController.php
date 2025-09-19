@@ -18,7 +18,8 @@ use Google_Service_Drive_Permission;
 use App\Http\Resources\AlbumResource;
 use Illuminate\Support\Facades\Http;
 use Google\Client as GoogleClient;
-
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AlbumController extends Controller
 {
@@ -491,5 +492,27 @@ class AlbumController extends Controller
                 'error'   => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function save_image(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'folder' => 'required|string',
+        ]);
+
+        $image = $request->file('image');
+        $folder = trim($request->input('folder'));
+
+        $filename = Str::random(20) . '.' . $image->getClientOriginalExtension();
+
+        $path = $image->storeAs("public/$folder", $filename);
+
+        $publicPath = Storage::url("$folder/$filename"); 
+
+        return response()->json([
+            'success' => true,
+            'path' => $publicPath,
+        ]);
     }
 }

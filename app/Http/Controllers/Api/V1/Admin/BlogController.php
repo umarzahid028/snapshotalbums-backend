@@ -9,24 +9,57 @@ use Illuminate\Support\Str;
 use App\Http\Resources\BlogResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\Rule;
+
 
 class BlogController extends Controller
 {
     // List all blogs
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $blogs = Blog::latest()->paginate(10);
-            return BlogResource::collection($blogs)
-            ->additional([
-                'paginate' => [
-                    'current_page' => $blogs->currentPage(),
-                    'last_page' => $blogs->lastPage(),
-                    'per_page' => $blogs->perPage(),
-                    'total' => $blogs->total(),
-                ]
-            ]);
+            $perPage = $request->get('per_page', 7);
+            $search = $request->get('search');
+            $status = $request->get('status', 'all');
 
+            $query = Blog::query()->latest();
+
+            // 🔍 Apply search if provided
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('excerpt', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            }
+
+            if ($status !== 'all') {
+                $query->where('status', $status);
+            }
+
+            $blogs = $query->paginate($perPage);
+
+            $totalPosts = Blog::count();
+            $published = Blog::where('status', 'published')->count();
+            $drafts = Blog::where('status', 'draft')->count();
+            $totalViews = 0;
+
+            return BlogResource::collection($blogs)
+                ->additional([
+                    'stats' => [
+                        'total_posts' => $totalPosts,
+                        'published'   => $published,
+                        'drafts'      => $drafts,
+                        'total_views' => $totalViews,
+                    ],
+                    'paginate' => [
+                        'current_page' => $blogs->currentPage(),
+                        'last_page'    => $blogs->lastPage(),
+                        'per_page'     => $blogs->perPage(),
+                        'total'        => $blogs->total(),
+                    ]
+                ]);
         } catch (\Exception $e) {
             Log::error('Blog Index Error: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to fetch blogs' . $e->getMessage()], 500);
@@ -58,7 +91,7 @@ class BlogController extends Controller
             'meta_description' => 'nullable|string|max:255',
             'author' => 'nullable|string|max:255',
             'author_email' => 'nullable|email|max:255',
-            'status' => 'nullable|in:draft,published',
+            'status' => 'nullable|in:draft,published,archived',
             'category' => 'nullable|string|max:255',
             'tags' => 'nullable|string|max:255',
         ]);
@@ -84,17 +117,21 @@ class BlogController extends Controller
     }
 
     // Update blog
-    public function update(Request $request, $slug)
+    public function update(Request $request, $id)
     {
         try {
-            $blog = Blog::where('slug', $slug)->firstOrFail();
+            $blog = Blog::where('slug', $id)->firstOrFail();
         } catch (\Exception $e) {
             return response()->json(['error' => 'Blog not found'], 404);
         }
 
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|unique:blogs,slug',
+            'slug' => [
+                'nullable',
+                'string',
+                Rule::unique('blogs', 'slug')->ignore($blog->id), 
+            ],
             'description' => 'nullable|string',
             'excerpt' => 'nullable|string|max:500',
             'image' => 'nullable|string',
@@ -102,11 +139,10 @@ class BlogController extends Controller
             'meta_description' => 'nullable|string|max:255',
             'author' => 'nullable|string|max:255',
             'author_email' => 'nullable|email|max:255',
-            'status' => 'nullable|in:draft,published',
+            'status' => 'nullable|in:draft,published,archived',
             'category' => 'nullable|string|max:255',
             'tags' => 'nullable|string|max:255',
         ]);
-
 
         if (!empty($data['title']) && empty($data['slug'])) {
             $data['slug'] = Str::slug($data['title']);
@@ -120,14 +156,15 @@ class BlogController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Blog update successfully',
+                'message' => 'Blog updated successfully',
                 'data' => new BlogResource($updatedBlog)
             ], 200);
         } catch (\Exception $e) {
             Log::error('Blog Update Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to update blog' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to update blog'], 500);
         }
     }
+
 
     // Delete blog
     public function destroy($slug)
@@ -139,10 +176,21 @@ class BlogController extends Controller
                 $blog->delete();
             });
 
-            return response()->json(['message' => 'Blog deleted successfully.'], 200);
+            return response()->json([
+                'success' => true,
+                'message' => 'Blog deleted successfully.'
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Blog not found.'
+            ], 404);
         } catch (\Exception $e) {
             Log::error('Blog Delete Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to delete blog' . $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete blog. ' . $e->getMessage()
+            ], 500);
         }
     }
 }

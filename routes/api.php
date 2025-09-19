@@ -42,6 +42,8 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/get-token', [UserAuthController::class, 'token']);
 
+    Route::post('/upload-image', [UserAlbumController::class, 'save_image']);
+
     // Upload File
     Route::post('/upload/file', [UserAlbumController::class, 'upload']);
 
@@ -83,7 +85,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/blogs', [AdminBlogController::class, 'index']);
             Route::get('/blogs/{slug}', [UserBlogController::class, 'show']);
             Route::post('/blogs/store', [AdminBlogController::class, 'store']);
-            Route::put('/blogs/{slug}', [AdminBlogController::class, 'update']);
+            Route::put('/blogs/{id}', [AdminBlogController::class, 'update']);
             Route::delete('/blogs/{slug}', [AdminBlogController::class, 'destroy']);
 
             Route::get('/faqs', [AdminFaqController::class, 'index']);
