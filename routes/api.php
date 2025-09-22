@@ -80,6 +80,9 @@ Route::prefix('v1')->group(function () {
         Route::middleware('auth:admin')->group(function () {
             Route::post('/logout', [AdminAuthController::class, 'logout']);
 
+            Route::get('/dashboard', [AdminAuthController::class, 'dashboard']);
+
+
             Route::get('/all-user', [AdminUserController::class, 'index']);
             Route::post('/user', [AdminUserController::class, 'store']);
             Route::get('/user/{id}', [AdminUserController::class, 'show']);

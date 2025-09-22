@@ -20,6 +20,7 @@ GOOGLE_CLIENT_SECRET=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
 GOOGLE_REDIRECT_URI_LOGIN=http://localhost:5173/google/callback
 GOOGLE_REDIRECT_URI=http://localhost:5173/dashboard
 
+STRIPE_WEBHOOK_SECRET=
 
 <?php
 return [

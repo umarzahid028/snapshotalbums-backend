@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Resources\SubscriptionPlanResource;
+use Carbon\Carbon;
 
 class SubscriptionPlanController extends Controller
 {
@@ -148,10 +149,16 @@ class SubscriptionPlanController extends Controller
     public function bill_Subscription()
     {
         try {
+            $now = Carbon::now();
+            $currentMonth = $now->month;
+            $currentYear = $now->year;
+
             $subscriptions = UserSubscription::with(['user', 'plan'])->paginate(7);
 
             $activeSubscriptions = UserSubscription::with(['user', 'plan'])
                 ->where('status', 'succeeded')
+                ->whereMonth('created_at', $currentMonth)
+                ->whereYear('created_at', $currentYear)
                 ->get();
 
             $activeCount = $activeSubscriptions->count();

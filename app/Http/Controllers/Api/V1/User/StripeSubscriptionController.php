@@ -178,9 +178,6 @@ class StripeSubscriptionController extends Controller
     }
 
 
-
-
-
     // public function subscribe(Request $request)
     // {
     //     $user = Auth::user();

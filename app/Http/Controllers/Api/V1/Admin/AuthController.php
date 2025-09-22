@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\User;
+use App\Models\UserSubscription;
+use App\Models\SubscriptionPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -103,5 +105,57 @@ class AuthController extends Controller
         }
     }
 
-    
+
+    public function dashboard()
+    {
+        $totalUsers = User::count();
+
+        $totalActiveSubscriptions = UserSubscription::where('status', 'succeeded')->count();
+
+        $monthlyRevenue = UserSubscription::where('status', 'succeeded')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->sum('plan_price');
+
+        $monthlyTrilaing = UserSubscription::where('status', 'trialing')->orwhere('status', 'active')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->sum('plan_price');
+
+        $planUsage = UserSubscription::select('plan_id')
+        ->selectRaw('COUNT(*) as total_users, SUM(plan_price) as total_revenue')
+        ->groupBy('plan_id')
+        ->with('plan')
+        ->get()
+        ->map(function ($item) {
+            return [
+                'plan_id' => $item->plan_id,
+                'plan_name' => $item->plan->name ?? 'N/A',
+                'total_users' => $item->total_users,
+                'total_revenue' => $item->total_revenue,
+            ];
+        });
+
+        $latestSubscriptions = UserSubscription::with('user', 'plan')
+        ->latest()
+        ->take(5)
+        ->get()
+        ->map(function ($subscription) {
+            return [
+                'id' => $subscription->id ?? '',
+                'user_name' => $subscription->user->name ?? 'N/A',
+                'plan_name' => $subscription->plan->name ?? 'N/A',
+                'status' => $subscription->status,
+                'plan_price' => $subscription->plan_price,
+                'created_at' => $subscription->created_at->toDateTimeString(),
+            ];
+        });
+
+        return response()->json([
+            'totalUsers' => $totalUsers,
+            'totalActiveSubscription' => $totalActiveSubscriptions,
+            'totalRevenue' => $monthlyRevenue,
+            'totalTrialSubscription' => $monthlyTrilaing,
+            'planUsage' => $planUsage,
+            'latestSubscriptions' => $latestSubscriptions,
+        ], 200);
+    }
 }
