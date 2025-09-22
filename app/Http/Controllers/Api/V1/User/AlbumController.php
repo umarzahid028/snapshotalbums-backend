@@ -511,9 +511,12 @@ class AlbumController extends Controller
 
         $publicPath = Storage::url("$folder/$filename"); 
 
+        $fullPath = Storage::path("$folder/$filename");
+
         return response()->json([
             'success' => true,
-            'path' => $publicPath,
+            'publicPath' => $publicPath,
+            'path' => $fullPath,
         ]);
     }
 }
