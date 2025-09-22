@@ -293,7 +293,7 @@ class AuthController extends Controller
         }
     }
 
-    public function disconnectGoogleDrive()
+    public function disconnectGoogleDrive(Request $request)
     {
         try {
             $user = Auth::user();

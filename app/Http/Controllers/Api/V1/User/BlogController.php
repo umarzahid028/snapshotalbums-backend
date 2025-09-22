@@ -15,7 +15,7 @@ class BlogController extends Controller
     public function index()
     {
         try {
-            $blogs = Blog::latest()->get();
+           $blogs = Blog::where('status', 'published')->latest()->paginate(10);
             return BlogResource::collection($blogs);
         } catch (\Exception $e) {
             Log::error('Blog Index Error: ' . $e->getMessage());

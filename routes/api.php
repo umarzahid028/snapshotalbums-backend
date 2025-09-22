@@ -53,11 +53,14 @@ Route::prefix('v1')->group(function () {
         Route::get('/user-dashboard', [UserDashboardController::class, 'index']);
 
         Route::get('/user-profile', [UserDashboardController::class, 'profile']);
+        Route::post('/user-profile/update', [UserDashboardController::class, 'updateProfile']);
+        Route::post('/user-profile/update-password', [UserDashboardController::class, 'updatePassword']);
+        Route::delete('/user-profile/delete', [UserDashboardController::class, 'deleteAccount']);
         
         Route::get('/user', [UserAuthController::class, 'user']);
 
         Route::get('/google/connect-drive', [UserAuthController::class, 'connectGoogleDrive']);
-        Route::get('/google/revoke-drive', [UserAuthController::class, 'disconnectGoogleDrive']);
+        Route::post('/google/revoke-drive', [UserAuthController::class, 'disconnectGoogleDrive']);
 
         Route::post('/subscribe', [StripeSubscriptionController::class, 'subscribe']);
         Route::post('/subscription/cancel', [StripeSubscriptionController::class, 'cancel']);
@@ -103,6 +106,8 @@ Route::prefix('v1')->group(function () {
             Route::delete('/plans/{id}', [AdminSubscriptionPlanController::class, 'destroy']);
 
             Route::get('/google-drive', [AdminDriveAccountController::class, 'index']);
+
+            Route::get('/bill-Subscription', [AdminSubscriptionPlanController::class, 'bill_Subscription']);
 
             Route::get('/setting', [AdminSettingsController::class, 'index']);
             Route::post('/setting', [AdminSettingsController::class, 'storeOrUpdate']);

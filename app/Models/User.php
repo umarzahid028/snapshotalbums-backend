@@ -37,6 +37,12 @@ class User extends Authenticatable
 
         'access_token',
         'stripe_customer_id',
+
+        'phone',
+        'location',
+        'bio',
+        'email_notifications',
+        'event_reminders',
     ];
 
     /**

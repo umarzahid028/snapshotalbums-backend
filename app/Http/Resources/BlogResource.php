@@ -28,6 +28,7 @@ class BlogResource extends JsonResource
             'status' => $this->status,
             'category' => $this->category,
             'tags' => $this->tags,
+            'created_at' => $this->created_at,
             'meta' => [
                 'title' => $this->meta_title,
                 'description' => $this->meta_description,

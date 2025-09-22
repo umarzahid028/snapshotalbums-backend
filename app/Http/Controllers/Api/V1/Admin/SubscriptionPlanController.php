@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SubscriptionPlan;
+use App\Models\UserSubscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -120,7 +121,6 @@ class SubscriptionPlanController extends Controller
                 'id' => $plan->id,
                 'is_active' => $plan->is_active,
             ], 200);
-
         } catch (\Exception $e) {
             Log::error('Subscription Plan Update Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['message' => 'Failed to update plan', 'error' => $e->getMessage()], 500);
@@ -142,6 +142,45 @@ class SubscriptionPlanController extends Controller
         } catch (\Exception $e) {
             Log::error('Subscription Plan Delete Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['message' => 'Failed to delete plan', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function bill_Subscription()
+    {
+        try {
+            $subscriptions = UserSubscription::with(['user', 'plan'])->paginate(7);
+
+            $activeSubscriptions = UserSubscription::with(['user', 'plan'])
+                ->where('status', 'succeeded')
+                ->get();
+
+            $activeCount = $activeSubscriptions->count();
+            $totalRevenue = $activeSubscriptions->sum('plan_price');
+
+            // Monthly Recurring Revenue (MRR)
+            $mrr = $activeSubscriptions->sum(function ($sub) {
+                if ($sub->plan_duration === 'monthly') {
+                    return $sub->plan_price;
+                } elseif ($sub->plan_duration === 'yearly') {
+                    return $sub->plan_price / 12;
+                }
+                return 0;
+            });
+
+            return response()->json([
+                'active_subscriptions'      => $activeCount,
+                'total_revenue'             => $totalRevenue,
+                'monthly_recurring_revenue' => round($mrr, 2),
+                'subscriptions'             => $subscriptions,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Subscription Plan Index Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json([
+                'message' => 'Failed to fetch subscription stats',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
     }
 }
