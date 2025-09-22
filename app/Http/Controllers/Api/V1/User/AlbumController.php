@@ -452,7 +452,7 @@ class AlbumController extends Controller
             $folder->total_files = $totalFilesInFolder;
             $folder->save();
 
-            
+
             $links = [];
             foreach ($files->getFiles() as $file) {
                 $links[] = [
@@ -497,6 +497,7 @@ class AlbumController extends Controller
 
     public function save_image(Request $request)
     {
+        // Validate the request
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'folder' => 'required|string',
@@ -505,18 +506,20 @@ class AlbumController extends Controller
         $image = $request->file('image');
         $folder = trim($request->input('folder'));
 
+        $folder = trim($request->input('folder'));
         $filename = Str::random(20) . '.' . $image->getClientOriginalExtension();
 
-        $path = $image->storeAs("public/$folder", $filename);
+        // Use 'public' disk
+        $path = $image->storeAs($folder, $filename, 'public');
 
-        $publicPath = Storage::url("$folder/$filename"); 
+        // Public URL
+        $publicPath = Storage::url($path);
 
-        $fullPath = Storage::path("$folder/$filename");
+        $fullUrl = url($publicPath);
 
         return response()->json([
             'success' => true,
-            'publicPath' => $publicPath,
-            'path' => $fullPath,
+            'path' => $fullUrl,
         ]);
     }
 }
