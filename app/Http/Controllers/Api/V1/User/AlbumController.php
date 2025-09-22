@@ -452,7 +452,7 @@ class AlbumController extends Controller
             $folder->total_files = $totalFilesInFolder;
             $folder->save();
 
-            // ✅ Extract only links
+            
             $links = [];
             foreach ($files->getFiles() as $file) {
                 $links[] = [
@@ -484,6 +484,7 @@ class AlbumController extends Controller
             return response()->json([
                 'success' => true,
                 'files'   => $links,
+                'files_all'   => $files->getFiles(),
             ]);
         } catch (\Exception $e) {
             return response()->json([

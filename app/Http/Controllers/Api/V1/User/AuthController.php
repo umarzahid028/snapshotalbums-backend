@@ -84,12 +84,13 @@ class AuthController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-        'user' => [
-            'id'   => $user->id,
-            'name'   => $user->name,
-            'email'  => $user->email,
-        ],
-        'token' => $token], 201);
+            'user' => [
+                'id'   => $user->id,
+                'name'   => $user->name,
+                'email'  => $user->email,
+            ],
+            'token' => $token
+        ], 201);
     }
 
     // Login
@@ -111,12 +112,13 @@ class AuthController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-        'user' => [
-            'id'   => $user->id,
-            'name'   => $user->name,
-            'email'  => $user->email,
-        ], 
-        'token' => $token]);
+            'user' => [
+                'id'   => $user->id,
+                'name'   => $user->name,
+                'email'  => $user->email,
+            ],
+            'token' => $token
+        ]);
     }
 
     // Logout
@@ -287,6 +289,48 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Google login failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function disconnectGoogleDrive()
+    {
+        try {
+            $user = Auth::user();
+
+            $driveAccount = DriveAccount::where('user_id', $user->id)->first();
+
+            if (!$driveAccount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No connected Google Drive account found.'
+                ], 404);
+            }
+
+            if ($driveAccount->google_token) {
+                $revoke = Http::asForm()->post('https://oauth2.googleapis.com/revoke', [
+                    'token' => $driveAccount->google_token,
+                ]);
+
+                if ($revoke->failed()) {
+                   
+                    \Log::warning('Failed to revoke Google Drive token', [
+                        'user_id' => $user->id,
+                        'response' => $revoke->body()
+                    ]);
+                }
+            }
+
+            $driveAccount->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Google Drive disconnected successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to disconnect Google Drive: ' . $e->getMessage(),
             ], 500);
         }
     }

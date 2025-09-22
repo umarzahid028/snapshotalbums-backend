@@ -57,6 +57,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/user', [UserAuthController::class, 'user']);
 
         Route::get('/google/connect-drive', [UserAuthController::class, 'connectGoogleDrive']);
+        Route::get('/google/revoke-drive', [UserAuthController::class, 'disconnectGoogleDrive']);
 
         Route::post('/subscribe', [StripeSubscriptionController::class, 'subscribe']);
         Route::post('/subscription/cancel', [StripeSubscriptionController::class, 'cancel']);
