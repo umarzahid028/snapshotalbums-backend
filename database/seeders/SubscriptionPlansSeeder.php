@@ -33,7 +33,7 @@ class SubscriptionPlansSeeder extends Seeder
             [
                 'name' => 'Premium',
                 'slug' => Str::slug('Premium'),
-                'no_of_ablums' => null, // unlimited
+                'no_of_ablums' => 1000,
                 'price' => 9.99,
                 'description' => 'Perfect for users that want to create albums for all of their events, or need different QR codes to keep their guest\'s uploads organized. A must have for Event Planners, Venues, Churches or anyone that hosts events. Collect guest\'s photos and videos and keep them organized!',
                 'is_popular' => 1,
