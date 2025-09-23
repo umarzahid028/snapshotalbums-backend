@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Album;
 use App\Models\SubscriptionPlan;
 use App\Models\UserSubscription;
+use App\Models\FAQ;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -61,6 +62,18 @@ class DashboardController extends Controller
                 'message' => 'Something went wrong. Please try again later.' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function home()
+    {
+        $plan = SubscriptionPlan::where('is_active',true)->latest()->get();
+
+        $faqs = FAQ::where('is_active',true)->where('category','Home')->latest()->get();
+
+        return response()->json([
+            'plan' => $plan,
+            'faqs' => $faqs,
+        ], 200);
     }
 
     public function profile()
@@ -199,8 +212,6 @@ class DashboardController extends Controller
             ], 500);
         }
     }
-
-
 
     public function deleteAccount(Request $request)
     {

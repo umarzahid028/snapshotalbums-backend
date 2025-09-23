@@ -26,6 +26,7 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/google/connect-drive/callback', [UserAuthController::class, 'handleConnectGoogleDriveCallback']);
 
+    Route::get('/home', [UserDashboardController::class, 'home']);
 
     // User Email/Password Auth
     Route::post('/register', [UserAuthController::class, 'register']);
