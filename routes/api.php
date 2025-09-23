@@ -28,6 +28,8 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/home', [UserDashboardController::class, 'home']);
 
+    Route::post('/contact', [UserDashboardController::class, 'contact']);
+
     // User Email/Password Auth
     Route::post('/register', [UserAuthController::class, 'register']);
     Route::post('/login', [UserAuthController::class, 'login'])->name('login');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Album;
+use App\Models\Setting;
 use App\Models\SubscriptionPlan;
 use App\Models\UserSubscription;
 use App\Models\FAQ;
@@ -13,6 +14,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use App\Http\Resources\AlbumResource;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ContactMail;
+
 
 class DashboardController extends Controller
 {
@@ -66,14 +70,38 @@ class DashboardController extends Controller
 
     public function home()
     {
-        $plan = SubscriptionPlan::where('is_active',true)->latest()->get();
+        $plan = SubscriptionPlan::where('is_active', true)->latest()->get();
 
-        $faqs = FAQ::where('is_active',true)->where('category','Home')->latest()->get();
+        $faqs = FAQ::where('is_active', true)->where('category', 'Home')->latest()->get();
 
         return response()->json([
             'plan' => $plan,
             'faqs' => $faqs,
         ], 200);
+    }
+
+    public function contact(Request $request)
+    {
+        $data = $request->validate([
+            'name'         => 'required|string|max:255',
+            'email'        => 'required|email',
+            'inquiry_type' => 'nullable|string|max:255',
+            'subject'      => 'required|string|max:255',
+            'message'      => 'required|string',
+        ]);
+
+        $setting = Setting::first();
+        $companyName = $setting ? $setting->site_name : 'Your Company Name';
+
+        $data['company_name'] = $companyName;
+
+        Mail::to(config('mail.to.address'), config('mail.to.name'))
+            ->send(new ContactMail($data));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email sent successfully'
+        ]);
     }
 
     public function profile()
@@ -89,8 +117,8 @@ class DashboardController extends Controller
                 ], 401);
             }
 
-            $plans = SubscriptionPlan::where('is_active',true)->latest()->get();
-            $subscription = UserSubscription::where('user_id',$user->id)->latest()->first();
+            $plans = SubscriptionPlan::where('is_active', true)->latest()->get();
+            $subscription = UserSubscription::where('user_id', $user->id)->latest()->first();
 
             return response()->json([
                 'user' => [

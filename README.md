@@ -22,6 +22,21 @@ GOOGLE_REDIRECT_URI=http://localhost:5173/dashboard
 
 STRIPE_WEBHOOK_SECRET=
 
+
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=yourgmail@gmail.com
+MAIL_PASSWORD=your_app_password   # use app password, not Gmail password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=yourgmail@gmail.com
+MAIL_FROM_NAME="Your App"
+
+MAIL_TO_ADDRESS=support@yourdomain.com
+MAIL_TO_NAME=
+
+
 <?php
 return [
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
