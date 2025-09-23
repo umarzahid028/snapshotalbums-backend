@@ -12,16 +12,39 @@ use Illuminate\Support\Facades\Log;
 
 class BlogController extends Controller
 {
-    public function index()
-    {
-        try {
-           $blogs = Blog::where('status', 'published')->latest()->paginate(10);
-            return BlogResource::collection($blogs);
-        } catch (\Exception $e) {
-            Log::error('Blog Index Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch blogs' . $e->getMessage()], 500);
+   public function index(Request $request)
+{
+    try {
+        $query = Blog::where('status', 'published')->latest();
+
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('excerpt', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
         }
+
+        if ($request->filled('category') && $request->category !== 'All') {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('tag') && $request->tag !== 'All') {
+            $query->whereRaw("FIND_IN_SET(?, tags)", [$request->tag]);
+        }
+
+        $blogs = $query->paginate(10);
+
+        return BlogResource::collection($blogs);
+    } catch (\Exception $e) {
+        Log::error('Blog Index Error: ' . $e->getMessage());
+        return response()->json([
+            'error' => 'Failed to fetch blogs: ' . $e->getMessage()
+        ], 500);
     }
+}
+
 
     public function show($slug)
     {
