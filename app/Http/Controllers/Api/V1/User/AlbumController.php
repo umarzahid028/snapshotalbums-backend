@@ -85,7 +85,7 @@ class AlbumController extends Controller
             if (!$subscription) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No subscription found.'
+                    'message' => 'You don’t have an active subscription. Please activate one to continue.'
                 ], 404);
             }
 
