@@ -14,7 +14,7 @@ return [
         'http://localhost:5174',
         'http://127.0.0.1:5174',
         'https://snapshotalbums.vercel.app',
-        'https://apis.snapshotalbums.com'
+        'https://apis.snapshotalbums.net'
     ],
 
     'allowed_origins_patterns' => [],
