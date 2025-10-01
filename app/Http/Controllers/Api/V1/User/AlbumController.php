@@ -103,25 +103,15 @@ class AlbumController extends Controller
                 ], 403);
             }
 
-            // 🔹 Check active paid subscription
-            if (
-                $subscription->transaction_id &&
-                $subscription->status === 'active' &&
-                $subscription->transaction_status === 'succeeded'
-            ) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Your subscription is active.',
-                    'data' => $subscription
-                ], 200);
-            }
-
-            // 🔹 Otherwise check trial
-            if ($subscription->trial_ends_at && now()->greaterThan($subscription->trial_ends_at)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Your trial period has ended.'
-                ], 403);
+            // 🔹 Check subscription status
+            if (!$subscription->transaction_id || $subscription->status !== 'active' || $subscription->transaction_status !== 'succeeded') {
+                // If no active paid subscription, check trial
+                if ($subscription->trial_ends_at && now()->greaterThan($subscription->trial_ends_at)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Your trial period has ended.'
+                    ], 403);
+                }
             }
 
             if (!$driveAccount->google_token) {
