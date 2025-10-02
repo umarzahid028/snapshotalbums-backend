@@ -20,7 +20,7 @@ use App\Http\Controllers\Api\V1\Admin\SettingsController as AdminSettingsControl
 
 
 Route::prefix('v1')->group(function () {
-    
+
     Route::get('/auth/google/redirect', [UserAuthController::class, 'redirectToGoogle']);
     Route::get('/auth/google/callback', [UserAuthController::class, 'handleGoogleCallback']);
 
@@ -34,7 +34,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/register', [UserAuthController::class, 'register']);
     Route::post('/login', [UserAuthController::class, 'login'])->name('login');
     Route::post('/forgot-password', [UserAuthController::class, 'forgotPassword']);
-    Route::post('/reset-password', [UserAuthController::class, 'resetPassword']); 
+    Route::post('/reset-password', [UserAuthController::class, 'resetPassword']);
 
     Route::get('/blogs', [UserBlogController::class, 'index']);
     Route::get('/blogs/{slug}', [UserBlogController::class, 'show']);
@@ -52,14 +52,14 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [UserAuthController::class, 'logout']);
-        
+
         Route::get('/user-dashboard', [UserDashboardController::class, 'index']);
 
         Route::get('/user-profile', [UserDashboardController::class, 'profile']);
         Route::post('/user-profile/update', [UserDashboardController::class, 'updateProfile']);
         Route::post('/user-profile/update-password', [UserDashboardController::class, 'updatePassword']);
         Route::delete('/user-profile/delete', [UserDashboardController::class, 'deleteAccount']);
-        
+
         Route::get('/user', [UserAuthController::class, 'user']);
 
         Route::get('/google/connect-drive', [UserAuthController::class, 'connectGoogleDrive']);
@@ -70,6 +70,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/subscription/status', [StripeSubscriptionController::class, 'status']);
 
         Route::post('/albums', [UserAlbumController::class, 'create']);
+        Route::get('/albums', [UserAlbumController::class, 'list']); // Add this route to fix 404
         Route::get('/albums/list', [UserAlbumController::class, 'list']);
 
         Route::post('/drive/file', [UserAlbumController::class, 'get_file']);

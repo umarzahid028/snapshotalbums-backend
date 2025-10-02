@@ -96,6 +96,14 @@ class AlbumController extends Controller
                 ], 404);
             }
 
+            // Check if drive account is properly connected with tokens
+            if (!$driveAccount->google_token || !$driveAccount->google_refresh_token) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your Google Drive account is not properly connected. Please reconnect it.'
+                ], 400);
+            }
+
             if ($subscription && $checkAlbumCount > $subscription->plan_no_of_albums) {
                 return response()->json([
                     'success' => false,
@@ -131,32 +139,43 @@ class AlbumController extends Controller
 
             // If expired, refresh
             if ($this->gClient->isAccessTokenExpired()) {
-                $newToken = $this->gClient->fetchAccessTokenWithRefreshToken($driveAccount->google_refresh_token);
+                try {
+                    $newToken = $this->gClient->fetchAccessTokenWithRefreshToken($driveAccount->google_refresh_token);
 
-                if (isset($newToken['error'])) {
+                    if (isset($newToken['error'])) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Failed to refresh token. Please reconnect Google Drive.',
+                            'error'   => $newToken['error']
+                        ], 401);
+                    }
+
+                    // Merge old + new token data
+                    $updatedToken = array_merge([
+                        'access_token'  => $driveAccount->google_token,
+                        'refresh_token' => $driveAccount->google_refresh_token,
+                        'expires_in'    => $driveAccount->google_token_expires_in,
+                        'created'       => time(),
+                    ], $newToken);
+
+                    // Update the json_token field as well
+                    $driveAccount->update([
+                        'google_token'          => $updatedToken['access_token'],
+                        'google_refresh_token'  => $updatedToken['refresh_token'] ?? $driveAccount->google_refresh_token,
+                        'google_token_expires_in' => $updatedToken['expires_in'],
+                        'google_token_json'     => json_encode($updatedToken),
+                        'json_token'            => json_encode($updatedToken), // Add this line to fix token issues
+                    ]);
+
+                    $this->gClient->setAccessToken($updatedToken);
+                } catch (\Exception $e) {
+                    Log::error('Token refresh error: ' . $e->getMessage());
                     return response()->json([
                         'success' => false,
-                        'message' => 'Failed to refresh token. Please reconnect Google Drive.',
-                        'error'   => $newToken['error']
+                        'message' => 'Failed to refresh Google Drive token. Please reconnect your account.',
+                        'error'   => $e->getMessage()
                     ], 401);
                 }
-
-                // Merge old + new token data
-                $updatedToken = array_merge([
-                    'access_token'  => $driveAccount->google_token,
-                    'refresh_token' => $driveAccount->google_refresh_token,
-                    'expires_in'    => $driveAccount->google_token_expires_in,
-                    'created'       => time(),
-                ], $newToken);
-
-                $driveAccount->update([
-                    'google_token'          => $updatedToken['access_token'],
-                    'google_refresh_token'  => $updatedToken['refresh_token'] ?? $driveAccount->google_refresh_token,
-                    'google_token_expires_in' => $updatedToken['expires_in'],
-                    'google_token_json'     => json_encode($updatedToken),
-                ]);
-
-                $this->gClient->setAccessToken($updatedToken);
             }
 
             $service = new Google_Service_Drive($this->gClient);
