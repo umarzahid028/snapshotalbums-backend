@@ -38,7 +38,16 @@ class StripeSubscriptionController extends Controller
         ]);
 
         try {
-            \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+            $stripeSecret = env('STRIPE_SECRET');
+
+            if (!$stripeSecret) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stripe is not configured properly. Please contact support.'
+                ], 500);
+            }
+
+            \Stripe\Stripe::setApiKey($stripeSecret);
 
             $user = User::find($request->userId);
 
@@ -73,15 +82,38 @@ class StripeSubscriptionController extends Controller
             }
 
             // Attach the PaymentMethod to the customer
-            $paymentMethod = \Stripe\PaymentMethod::retrieve($request->stripeToken);
-            $paymentMethod->attach(['customer' => $customer->id]);
+            try {
+                $paymentMethod = \Stripe\PaymentMethod::retrieve($request->stripeToken);
 
-            // Set as default payment method for invoices
-            \Stripe\Customer::update($customer->id, [
-                'invoice_settings' => [
-                    'default_payment_method' => $paymentMethod->id,
-                ],
-            ]);
+                // Check if payment method is already attached to another customer
+                if ($paymentMethod->customer && $paymentMethod->customer !== $customer->id) {
+                    // Detach from previous customer if needed (optional, depending on your use case)
+                    // For now, we'll just throw an error
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'This payment method is already attached to another customer.'
+                    ], 400);
+                }
+
+                // Attach payment method to customer if not already attached
+                if (!$paymentMethod->customer) {
+                    $paymentMethod->attach(['customer' => $customer->id]);
+                }
+
+                // Set as default payment method for invoices
+                \Stripe\Customer::update($customer->id, [
+                    'invoice_settings' => [
+                        'default_payment_method' => $paymentMethod->id,
+                    ],
+                ]);
+            } catch (\Stripe\Exception\InvalidRequestException $e) {
+                // PaymentMethod doesn't exist or is invalid
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid payment method. Please try again with a valid payment method.',
+                    'error' => $e->getMessage()
+                ], 400);
+            }
 
 
             // Create Stripe Product
