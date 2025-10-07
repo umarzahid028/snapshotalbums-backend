@@ -83,12 +83,26 @@ class StripeSubscriptionController extends Controller
 
             // Attach the PaymentMethod to the customer
             try {
+                Log::info('Attempting to retrieve PaymentMethod', [
+                    'payment_method_id' => $request->stripeToken,
+                    'stripe_account' => substr($stripeSecret, 0, 20) . '...' // Log partial key for debugging
+                ]);
+
                 $paymentMethod = \Stripe\PaymentMethod::retrieve($request->stripeToken);
+
+                Log::info('PaymentMethod retrieved successfully', [
+                    'payment_method_id' => $paymentMethod->id,
+                    'customer' => $paymentMethod->customer
+                ]);
 
                 // Check if payment method is already attached to another customer
                 if ($paymentMethod->customer && $paymentMethod->customer !== $customer->id) {
-                    // Detach from previous customer if needed (optional, depending on your use case)
-                    // For now, we'll just throw an error
+                    Log::warning('PaymentMethod already attached to different customer', [
+                        'payment_method' => $paymentMethod->id,
+                        'current_customer' => $paymentMethod->customer,
+                        'new_customer' => $customer->id
+                    ]);
+
                     return response()->json([
                         'success' => false,
                         'message' => 'This payment method is already attached to another customer.'
@@ -98,6 +112,10 @@ class StripeSubscriptionController extends Controller
                 // Attach payment method to customer if not already attached
                 if (!$paymentMethod->customer) {
                     $paymentMethod->attach(['customer' => $customer->id]);
+                    Log::info('PaymentMethod attached to customer', [
+                        'payment_method' => $paymentMethod->id,
+                        'customer' => $customer->id
+                    ]);
                 }
 
                 // Set as default payment method for invoices
@@ -106,12 +124,24 @@ class StripeSubscriptionController extends Controller
                         'default_payment_method' => $paymentMethod->id,
                     ],
                 ]);
+
+                Log::info('PaymentMethod set as default for customer', [
+                    'customer' => $customer->id,
+                    'payment_method' => $paymentMethod->id
+                ]);
             } catch (\Stripe\Exception\InvalidRequestException $e) {
                 // PaymentMethod doesn't exist or is invalid
+                Log::error('Invalid PaymentMethod', [
+                    'payment_method_id' => $request->stripeToken,
+                    'error' => $e->getMessage(),
+                    'stripe_error_code' => $e->getStripeCode()
+                ]);
+
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid payment method. Please try again with a valid payment method.',
-                    'error' => $e->getMessage()
+                    'message' => 'The payment method is invalid or was created with a different Stripe account. Please refresh the page and try again with a new card.',
+                    'error' => $e->getMessage(),
+                    'hint' => 'This usually happens when switching between different Stripe API keys. Please clear your browser cache and try again.'
                 ], 400);
             }
 
