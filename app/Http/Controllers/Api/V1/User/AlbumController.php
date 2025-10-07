@@ -112,14 +112,25 @@ class AlbumController extends Controller
             }
 
             // 🔹 Check subscription status
-            if (!$subscription->transaction_id || $subscription->status !== 'active' || $subscription->transaction_status !== 'succeeded') {
-                // If no active paid subscription, check trial
-                if ($subscription->trial_ends_at && now()->greaterThan($subscription->trial_ends_at)) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Your trial period has ended.'
-                    ], 403);
-                }
+            // Allow both 'trialing' and 'active' status, and transaction_status can be 'trialing' or 'succeeded'
+            $validStatuses = ['active', 'trialing'];
+            $validTransactionStatuses = ['succeeded', 'trialing'];
+
+            if (!$subscription->transaction_id ||
+                !in_array($subscription->status, $validStatuses) ||
+                !in_array($subscription->transaction_status, $validTransactionStatuses)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You need an active subscription to create albums.'
+                ], 403);
+            }
+
+            // Check if trial has ended for trialing subscriptions
+            if ($subscription->status === 'trialing' && $subscription->trial_ends_at && now()->greaterThan($subscription->trial_ends_at)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your trial period has ended. Please upgrade to continue.'
+                ], 403);
             }
 
             if (!$driveAccount->google_token) {
