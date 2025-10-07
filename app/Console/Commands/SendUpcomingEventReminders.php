@@ -30,29 +30,45 @@ class SendUpcomingEventReminders extends Command
      */
     public function handle()
     {
-        $this->info('Starting to send upcoming event reminder emails...');
+        $startTime = now();
 
-        // Get events happening in 3 days
-        $threeDaysFromNow = Carbon::now()->addDays(3)->startOfDay();
-        $threeDaysEnd = Carbon::now()->addDays(3)->endOfDay();
+        $this->info("🚀 [CRON START] SendUpcomingEventReminders - " . $startTime->format('Y-m-d H:i:s'));
+        Log::info("===== CRON JOB STARTED: SendUpcomingEventReminders =====", [
+            'timestamp' => $startTime->toDateTimeString(),
+        ]);
 
-        // Get events happening in 1 day (tomorrow)
-        $oneDayFromNow = Carbon::now()->addDays(1)->startOfDay();
-        $oneDayEnd = Carbon::now()->addDays(1)->endOfDay();
+        try {
+            // Get events happening in 3 days
+            $threeDaysFromNow = Carbon::now()->addDays(3)->startOfDay();
+            $threeDaysEnd = Carbon::now()->addDays(3)->endOfDay();
 
-        // Find albums for 3-day reminder
-        $albumsIn3Days = Album::whereBetween('event_date', [$threeDaysFromNow, $threeDaysEnd])
-            ->where('status', 'active')
-            ->with('user')
-            ->get();
+            // Get events happening in 1 day (tomorrow)
+            $oneDayFromNow = Carbon::now()->addDays(1)->startOfDay();
+            $oneDayEnd = Carbon::now()->addDays(1)->endOfDay();
 
-        // Find albums for 1-day reminder
-        $albumsIn1Day = Album::whereBetween('event_date', [$oneDayFromNow, $oneDayEnd])
-            ->where('status', 'active')
-            ->with('user')
-            ->get();
+            $this->info("📅 Checking for events in 3 days ({$threeDaysFromNow->format('Y-m-d')}) and 1 day ({$oneDayFromNow->format('Y-m-d')})");
 
-        $emailsSent = 0;
+            // Find albums for 3-day reminder
+            $albumsIn3Days = Album::whereBetween('event_date', [$threeDaysFromNow, $threeDaysEnd])
+                ->where('status', 'active')
+                ->with('user')
+                ->get();
+
+            // Find albums for 1-day reminder
+            $albumsIn1Day = Album::whereBetween('event_date', [$oneDayFromNow, $oneDayEnd])
+                ->where('status', 'active')
+                ->with('user')
+                ->get();
+
+            $this->info("📋 Found {$albumsIn3Days->count()} events in 3 days and {$albumsIn1Day->count()} events in 1 day");
+            Log::info("Events found for reminders", [
+                '3_day_events' => $albumsIn3Days->count(),
+                '1_day_events' => $albumsIn1Day->count(),
+                '3_day_list' => $albumsIn3Days->pluck('id', 'event_title')->toArray(),
+                '1_day_list' => $albumsIn1Day->pluck('id', 'event_title')->toArray(),
+            ]);
+
+            $emailsSent = 0;
 
         // Send 3-day reminders
         foreach ($albumsIn3Days as $album) {
@@ -84,9 +100,36 @@ class SendUpcomingEventReminders extends Command
             }
         }
 
-        $this->info("Completed! Sent {$emailsSent} reminder emails.");
-        Log::info("SendUpcomingEventReminders: Sent {$emailsSent} emails");
+            $endTime = now();
+            $duration = $startTime->diffInSeconds($endTime);
 
-        return 0;
+            $this->info("✅ Completed! Sent {$emailsSent} reminder emails");
+            $this->info("⏱️  Duration: {$duration} seconds");
+
+            Log::info("===== CRON JOB COMPLETED: SendUpcomingEventReminders =====", [
+                'emails_sent' => $emailsSent,
+                'duration_seconds' => $duration,
+                'start_time' => $startTime->toDateTimeString(),
+                'end_time' => $endTime->toDateTimeString(),
+                'status' => 'success'
+            ]);
+
+            return 0;
+        } catch (\Exception $e) {
+            $endTime = now();
+            $duration = $startTime->diffInSeconds($endTime);
+
+            $this->error("❌ Error sending reminders: " . $e->getMessage());
+            Log::error("===== CRON JOB FAILED: SendUpcomingEventReminders =====", [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'duration_seconds' => $duration,
+                'start_time' => $startTime->toDateTimeString(),
+                'end_time' => $endTime->toDateTimeString(),
+                'status' => 'failed'
+            ]);
+
+            return 1;
+        }
     }
 }
