@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 
@@ -42,10 +43,10 @@ class UserController extends Controller
             // Hash the password
             $validated['password'] = bcrypt($validated['password']);
 
-            // Convert status boolean to string
-            $validated['status'] = isset($validated['status'])
-                ? ($validated['status'] ? 'active' : 'inactive')
-                : 'inactive'; 
+            // Set default status if not provided
+            if (!isset($validated['status'])) {
+                $validated['status'] = true; // default to active (true)
+            }
 
             $user = User::create($validated);
 
@@ -120,9 +121,9 @@ class UserController extends Controller
             $user->password = Hash::make($validated['password']);
         }
 
-        // Update status
+        // Update status (boolean value, no conversion needed)
         if (isset($validated['status'])) {
-            $user->status = $validated['status'] ? 'active' : 'inactive';
+            $user->status = $validated['status'];
         }
 
         $user->save();

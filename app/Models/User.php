@@ -55,6 +55,17 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'status' => 'boolean',
+        'email_notifications' => 'boolean',
+        'event_reminders' => 'boolean',
+    ];
+
     public function isAdmin(): bool
     {
         return false;
