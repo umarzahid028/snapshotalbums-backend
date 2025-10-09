@@ -197,6 +197,9 @@ class StripeSubscriptionController extends Controller
 
             // Save subscription in DB
             $userSubscription = DB::transaction(function () use ($user, $plan, $request, $stripeSubscription) {
+                // Convert Stripe status string to boolean (true for active/trialing, false otherwise)
+                $isActive = in_array($stripeSubscription->status, ['active', 'trialing']);
+
                 return UserSubscription::create([
                     'user_id' => $user->id,
                     'plan_id' => $plan->id,
@@ -205,7 +208,7 @@ class StripeSubscriptionController extends Controller
                     'plan_no_of_albums' => $plan->no_of_albums ?? '',
                     'transaction_id' => $stripeSubscription->id ?? '',
                     'transaction_status' => $stripeSubscription->status ?? '',
-                    'status' => $stripeSubscription->status, // trialing or active
+                    'status' => $isActive, // boolean: true for active/trialing, false otherwise
                     'trial_ends_at' => now()->addDays(7),
                     'ends_at' => now()->addDays($plan->duration_days),
                     'payment_token' => $request->stripeToken ?? '',
@@ -407,9 +410,9 @@ class StripeSubscriptionController extends Controller
             $subscription->cancel_at_period_end = true;
             $subscription->save();
 
-            // Update subscription status in DB
+            // Update subscription status in DB (false = canceled/inactive)
             $UserSubscription->update([
-                'status'   => 'canceled',
+                'status'   => false,
                 'ends_at'  => \Carbon\Carbon::createFromTimestamp($subscription->current_period_end),
             ]);
 

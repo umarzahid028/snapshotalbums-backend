@@ -34,6 +34,10 @@ class UserSubscription extends Model
         'updated_at',
     ];
 
+    protected $casts = [
+        'status' => 'boolean',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
