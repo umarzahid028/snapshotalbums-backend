@@ -104,10 +104,10 @@ class AlbumController extends Controller
                 ], 400);
             }
 
-            if ($subscription && $checkAlbumCount > $subscription->plan_no_of_albums) {
+            if ($subscription && $checkAlbumCount >= $subscription->plan_no_of_ablums) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'You have reached the maximum number of albums allowed for your plan.'
+                    'message' => 'You have reached the maximum number of albums allowed for your plan. Please <a href="https://snapshotalbums.net/pricing" style="color: #059669; text-decoration: underline;">update your plan</a> to create another album.'
                 ], 403);
             }
 

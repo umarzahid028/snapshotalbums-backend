@@ -159,11 +159,31 @@ class StripeSubscriptionController extends Controller
                 try {
                     $existingSubscription = \Stripe\Subscription::retrieve($UserSubscription->transaction_id);
                     if ($existingSubscription->status === 'active' || $existingSubscription->status === 'trialing') {
-                        return response()->json(['message' => 'User already has an active subscription'], 400);
+                        // Check if user is trying to subscribe to the same plan
+                        if ($UserSubscription->plan_id == $request->plan_id) {
+                            return response()->json(['message' => 'You already have an active subscription to this plan'], 400);
+                        }
+
+                        // User is upgrading/downgrading - cancel the old subscription and create new one
+                        Log::info('User upgrading subscription', [
+                            'user_id' => $user->id,
+                            'old_plan' => $UserSubscription->plan_id,
+                            'new_plan' => $request->plan_id
+                        ]);
+
+                        // Cancel the old subscription immediately
+                        $existingSubscription->delete();
+
+                        // Update the old subscription record in DB
+                        $UserSubscription->update([
+                            'status' => false,
+                            'ends_at' => now(),
+                        ]);
                     }
                 } catch (\Exception $e) {
-                    $user->transaction_id = null;
-                    $user->save();
+                    Log::error('Error checking existing subscription: ' . $e->getMessage());
+                    $UserSubscription->transaction_id = null;
+                    $UserSubscription->save();
                 }
             }
 
