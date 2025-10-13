@@ -225,7 +225,7 @@ class StripeSubscriptionController extends Controller
                     'plan_id' => $plan->id,
                     'plan_price' => $plan->price ?? '',
                     'plan_duration' => $plan->duration_days ?? '',
-                    'plan_no_of_albums' => $plan->no_of_albums ?? '',
+                    'plan_no_of_ablums' => $plan->no_of_ablums ?? '',
                     'transaction_id' => $stripeSubscription->id ?? '',
                     'transaction_status' => $stripeSubscription->status ?? '',
                     'status' => $isActive, // boolean: true for active/trialing, false otherwise
