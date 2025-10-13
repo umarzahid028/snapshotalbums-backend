@@ -67,6 +67,7 @@ Route::prefix('v1')->group(function () {
 
         Route::post('/subscribe', [StripeSubscriptionController::class, 'subscribe']);
         Route::post('/subscription/cancel', [StripeSubscriptionController::class, 'cancel']);
+        Route::post('/subscription/refresh', [StripeSubscriptionController::class, 'refreshSubscription']);
         Route::get('/subscription/status', [StripeSubscriptionController::class, 'status']);
 
         Route::post('/albums', [UserAlbumController::class, 'create']);

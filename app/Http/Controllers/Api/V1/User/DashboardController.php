@@ -51,6 +51,26 @@ class DashboardController extends Controller
             // 5. Recent events (latest 3 albums)
             $recentEvents = Album::where('user_id', $user)->latest()->take(3)->get();
 
+            // 6. Get user's active subscription
+            $subscription = UserSubscription::where('user_id', $user)
+                ->latest()
+                ->with('plan')
+                ->first();
+
+            $subscriptionData = null;
+            if ($subscription) {
+                $subscriptionData = [
+                    'plan_name' => $subscription->plan->name ?? 'Unknown',
+                    'plan_id' => $subscription->plan_id,
+                    'album_limit' => $subscription->plan_no_of_ablums ?? 0,
+                    'albums_used' => $totalAlbums,
+                    'albums_remaining' => $subscription->plan_no_of_ablums >= 1000
+                        ? 'unlimited'
+                        : max(0, ($subscription->plan_no_of_ablums ?? 0) - $totalAlbums),
+                    'is_unlimited' => $subscription->plan_no_of_ablums >= 1000,
+                ];
+            }
+
             return response()->json([
                 'success' => true,
                 'total_albums' => $totalAlbums,
@@ -58,6 +78,7 @@ class DashboardController extends Controller
                 'total_guest' => $totalGuest,
                 'total_albums_this_month' => $totalAlbumsThisMonth,
                 'recent_events' => AlbumResource::collection($recentEvents),
+                'subscription' => $subscriptionData,
             ], 200);
         } catch (\Exception $e) {
 

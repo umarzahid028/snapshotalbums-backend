@@ -477,4 +477,55 @@ class StripeSubscriptionController extends Controller
             return response()->json(['message' => 'Failed to fetch subscription status', 'error' => $e->getMessage()], 500);
         }
     }
+
+    // Fix/refresh subscription data from plan
+    public function refreshSubscription(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            $subscription = UserSubscription::where('user_id', $user->id)
+                ->latest()
+                ->first();
+
+            if (!$subscription) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No subscription found'
+                ], 404);
+            }
+
+            // Get the plan details
+            $plan = SubscriptionPlan::find($subscription->plan_id);
+
+            if (!$plan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Plan not found'
+                ], 404);
+            }
+
+            // Update subscription with correct plan details
+            $subscription->update([
+                'plan_no_of_ablums' => $plan->no_of_ablums,
+                'plan_price' => $plan->price,
+                'plan_duration' => $plan->duration_days,
+            ]);
+
+            $subscription->load('plan');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Subscription refreshed successfully',
+                'data' => new UserSubscriptionResource($subscription)
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Refresh Subscription Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to refresh subscription',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
