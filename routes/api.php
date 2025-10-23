@@ -116,6 +116,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/google-drive', [AdminDriveAccountController::class, 'index']);
 
             Route::get('/bill-Subscription', [AdminSubscriptionPlanController::class, 'bill_Subscription']);
+            Route::post('/subscription/{subscriptionId}/cancel', [AdminSubscriptionPlanController::class, 'cancelUserSubscription']);
 
             Route::get('/setting', [AdminSettingsController::class, 'index']);
             Route::post('/setting', [AdminSettingsController::class, 'storeOrUpdate']);

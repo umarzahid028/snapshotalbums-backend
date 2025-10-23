@@ -190,4 +190,71 @@ class SubscriptionPlanController extends Controller
             ], 500);
         }
     }
+
+    // Admin: Cancel user subscription
+    public function cancelUserSubscription($subscriptionId)
+    {
+        try {
+            \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+
+            $userSubscription = UserSubscription::with(['user', 'plan'])->find($subscriptionId);
+
+            if (!$userSubscription) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Subscription not found.'
+                ], 404);
+            }
+
+            // Check if already canceled
+            if ($userSubscription->status === false || $userSubscription->status === 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This subscription is already cancelled.'
+                ], 400);
+            }
+
+            if (!$userSubscription->transaction_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No Stripe subscription ID found.'
+                ], 400);
+            }
+
+            // Cancel the subscription at the end of the current period
+            $subscription = \Stripe\Subscription::retrieve($userSubscription->transaction_id);
+            $subscription->cancel_at_period_end = true;
+            $subscription->save();
+
+            // Update subscription status in DB (false = canceled/inactive)
+            $userSubscription->update([
+                'status'   => false,
+                'ends_at'  => Carbon::createFromTimestamp($subscription->current_period_end),
+            ]);
+
+            $cancelDate = Carbon::createFromTimestamp($subscription->current_period_end);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Subscription cancelled successfully. User will retain access until ' . $cancelDate->format('Y-m-d H:i:s'),
+                'data' => [
+                    'subscription_id' => $userSubscription->id,
+                    'user_name' => $userSubscription->user->name,
+                    'access_until' => $cancelDate->format('Y-m-d H:i:s'),
+                ]
+            ], 200);
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            Log::error('Admin Cancel Subscription - Stripe API Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Stripe error: ' . $e->getMessage(),
+            ], 500);
+        } catch (\Exception $e) {
+            Log::error('Admin Cancel Subscription Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to cancel subscription: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }
