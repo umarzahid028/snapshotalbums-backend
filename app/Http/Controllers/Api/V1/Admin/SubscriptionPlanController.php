@@ -153,7 +153,7 @@ class SubscriptionPlanController extends Controller
             $currentMonth = $now->month;
             $currentYear = $now->year;
 
-            $subscriptions = UserSubscription::with(['user', 'plan'])->paginate(7);
+            $subscriptions = UserSubscription::with(['user', 'plan'])->latest()->paginate(7);
 
             $activeSubscriptions = UserSubscription::with(['user', 'plan'])
                 ->where('status', 'succeeded')
