@@ -240,11 +240,9 @@ class SupportTicketController extends Controller
             }
 
             try {
-                //Mail::to('umarzahid028@gmail.com')->send(new TicketReplyMail($ticket, $reply));
-                \Log::info('Admin reply email sent successfully to USER: ' . $ticket->email);
+                Mail::to('umarzahid028@gmail.com')->send(new TicketReplyMail($ticket, $reply));
             } catch (\Exception $e) {
-                // Log email error but don't fail the request
-                \Log::error('Failed to send ticket reply email to ' . $ticket->email . ': ' . $e->getMessage());
+                \Log::error('Failed to send ticket reply email: ' . $e->getMessage());
             }
 
             return response()->json([
