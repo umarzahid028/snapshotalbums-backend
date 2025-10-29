@@ -226,14 +226,6 @@ class SupportTicketController extends Controller
         try {
             $ticket = SupportTicket::findOrFail($id);
 
-            // Debug logging - check ticket details
-            \Log::info('Admin replying to ticket', [
-                'ticket_id' => $ticket->id,
-                'ticket_number' => $ticket->ticket_number,
-                'ticket_email' => $ticket->email,
-                'ticket_name' => $ticket->name,
-                'user_id' => $ticket->user_id,
-            ]);
 
             $reply = TicketReply::create([
                 'ticket_id' => $ticket->id,
@@ -242,22 +234,13 @@ class SupportTicketController extends Controller
                 'admin_id' => auth('admin')->id(),
             ]);
 
-            // Update ticket status to in_progress if it's currently open
+
             if ($ticket->status === 'open') {
                 $ticket->update(['status' => 'in_progress']);
             }
 
-            // Send email notification to the customer (user who created the ticket)
-            // Email should go to $ticket->email (the user's email), NOT support email
             try {
-                \Log::info('Sending admin reply email to USER (not support): ' . $ticket->email . ' for ticket: ' . $ticket->ticket_number);
-
-                // Verify we're not sending to support email
-                if ($ticket->email === 'support@snapshotalbums.net' || $ticket->email === 'snapshotalbums2023@gmail.com') {
-                    \Log::error('ERROR: Ticket email is set to support email instead of user email! Ticket ID: ' . $ticket->id);
-                }
-
-                Mail::to('umarzahid028@gmail.com')->send(new TicketReplyMail($ticket, $reply));
+                //Mail::to('umarzahid028@gmail.com')->send(new TicketReplyMail($ticket, $reply));
                 \Log::info('Admin reply email sent successfully to USER: ' . $ticket->email);
             } catch (\Exception $e) {
                 // Log email error but don't fail the request
