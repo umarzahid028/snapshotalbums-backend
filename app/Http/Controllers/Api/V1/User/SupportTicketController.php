@@ -94,16 +94,29 @@ class SupportTicketController extends Controller
         try {
             $user = $request->user();
 
+            \Log::info('Creating ticket for user', [
+                'user_id' => $user->id,
+                'user_email' => $user->email,
+                'user_name' => $user->name,
+            ]);
+
             $ticket = SupportTicket::create([
                 'ticket_number' => SupportTicket::generateTicketNumber(),
                 'subject' => $request->subject,
                 'message' => $request->message,
-                'email' => $user->email,
+                'email' => $user->email,  // This should be the USER's email, not support email
                 'name' => $user->name,
                 'user_id' => $user->id,
                 'priority' => $request->priority ?? 'medium',
                 'category' => $request->category,
                 'status' => 'open',
+            ]);
+
+            \Log::info('Ticket created successfully', [
+                'ticket_id' => $ticket->id,
+                'ticket_number' => $ticket->ticket_number,
+                'ticket_email' => $ticket->email,
+                'should_be_user_email' => $user->email,
             ]);
 
             // Send email notification to support team

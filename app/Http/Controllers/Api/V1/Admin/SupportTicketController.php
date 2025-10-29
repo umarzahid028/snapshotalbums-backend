@@ -108,15 +108,28 @@ class SupportTicketController extends Controller
         }
 
         try {
+            \Log::info('Creating PUBLIC ticket (from contact form)', [
+                'email' => $request->email,
+                'name' => $request->name,
+                'subject' => $request->subject,
+            ]);
+
             $ticket = SupportTicket::create([
                 'ticket_number' => SupportTicket::generateTicketNumber(),
                 'subject' => $request->subject,
                 'message' => $request->message,
-                'email' => $request->email,
+                'email' => $request->email,  // This should be the customer's email from the form
                 'name' => $request->name,
                 'priority' => $request->priority ?? 'medium',
                 'category' => $request->category,
                 'status' => 'open',
+            ]);
+
+            \Log::info('PUBLIC ticket created successfully', [
+                'ticket_id' => $ticket->id,
+                'ticket_number' => $ticket->ticket_number,
+                'ticket_email' => $ticket->email,
+                'form_email' => $request->email,
             ]);
 
             // Send email notification to support team
@@ -213,6 +226,15 @@ class SupportTicketController extends Controller
         try {
             $ticket = SupportTicket::findOrFail($id);
 
+            // Debug logging - check ticket details
+            \Log::info('Admin replying to ticket', [
+                'ticket_id' => $ticket->id,
+                'ticket_number' => $ticket->ticket_number,
+                'ticket_email' => $ticket->email,
+                'ticket_name' => $ticket->name,
+                'user_id' => $ticket->user_id,
+            ]);
+
             $reply = TicketReply::create([
                 'ticket_id' => $ticket->id,
                 'message' => $request->message,
@@ -226,10 +248,17 @@ class SupportTicketController extends Controller
             }
 
             // Send email notification to the customer (user who created the ticket)
+            // Email should go to $ticket->email (the user's email), NOT support email
             try {
-                \Log::info('Sending admin reply email to user: ' . $ticket->email . ' for ticket: ' . $ticket->ticket_number);
+                \Log::info('Sending admin reply email to USER (not support): ' . $ticket->email . ' for ticket: ' . $ticket->ticket_number);
+
+                // Verify we're not sending to support email
+                if ($ticket->email === 'support@snapshotalbums.net' || $ticket->email === 'snapshotalbums2023@gmail.com') {
+                    \Log::error('ERROR: Ticket email is set to support email instead of user email! Ticket ID: ' . $ticket->id);
+                }
+
                 Mail::to($ticket->email)->send(new TicketReplyMail($ticket, $reply));
-                \Log::info('Admin reply email sent successfully to: ' . $ticket->email);
+                \Log::info('Admin reply email sent successfully to USER: ' . $ticket->email);
             } catch (\Exception $e) {
                 // Log email error but don't fail the request
                 \Log::error('Failed to send ticket reply email to ' . $ticket->email . ': ' . $e->getMessage());
