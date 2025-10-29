@@ -33,6 +33,8 @@ class TicketReplyMail extends Mailable
     {
         return new Envelope(
             subject: 'Re: ' . $this->ticket->subject . ' [' . $this->ticket->ticket_number . ']',
+            from: 'support@snapshotalbums.net',
+            replyTo: ['support@snapshotalbums.net', 'snapshotalbums2023@gmail.com'],
         );
     }
 

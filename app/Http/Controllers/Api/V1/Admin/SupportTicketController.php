@@ -225,12 +225,14 @@ class SupportTicketController extends Controller
                 $ticket->update(['status' => 'in_progress']);
             }
 
-            // Send email notification to the customer
+            // Send email notification to the customer (user who created the ticket)
             try {
+                \Log::info('Sending admin reply email to user: ' . $ticket->email . ' for ticket: ' . $ticket->ticket_number);
                 Mail::to($ticket->email)->send(new TicketReplyMail($ticket, $reply));
+                \Log::info('Admin reply email sent successfully to: ' . $ticket->email);
             } catch (\Exception $e) {
                 // Log email error but don't fail the request
-                \Log::error('Failed to send ticket reply email: ' . $e->getMessage());
+                \Log::error('Failed to send ticket reply email to ' . $ticket->email . ': ' . $e->getMessage());
             }
 
             return response()->json([
