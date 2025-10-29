@@ -232,6 +232,7 @@ class SupportTicketController extends Controller
                 'message' => $request->message,
                 'is_admin_reply' => true,
                 'admin_id' => auth('admin')->id(),
+                'sender_email' => $ticket->email,
             ]);
 
 
