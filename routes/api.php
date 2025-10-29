@@ -48,6 +48,9 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/upload-image', [UserAlbumController::class, 'save_image']);
 
+    // Public support ticket creation
+    Route::post('/support-ticket', [AdminSupportTicketController::class, 'store']);
+
     // Upload File
     Route::post('/upload/file', [UserAlbumController::class, 'upload']);
 
