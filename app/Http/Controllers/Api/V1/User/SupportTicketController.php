@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api\V1\User;
 use App\Http\Controllers\Controller;
 use App\Models\SupportTicket;
 use App\Models\TicketReply;
+use App\Mail\UserReplyMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class SupportTicketController extends Controller
@@ -153,6 +155,10 @@ class SupportTicketController extends Controller
             if ($ticket->status === 'closed' || $ticket->status === 'resolved') {
                 $ticket->update(['status' => 'open']);
             }
+
+            // Send email notification to support team
+            Mail::to(['support@snapshotalbums.net', 'snapshotalbums2023@gmail.com'])
+                ->send(new UserReplyMail($ticket, $reply));
 
             return response()->json([
                 'success' => true,
