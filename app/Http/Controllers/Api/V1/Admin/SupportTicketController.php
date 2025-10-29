@@ -133,7 +133,7 @@ class SupportTicketController extends Controller
             ]);
 
             // Send email notification to support team
-            Mail::to(['umarzahid028@gmail.com'])
+            Mail::to($request->email)
                 ->send(new NewTicketMail($ticket));
 
             return response()->json([
@@ -241,7 +241,7 @@ class SupportTicketController extends Controller
             }
 
             try {
-                Mail::to('umarzahid028@gmail.com')->send(new TicketReplyMail($ticket, $reply));
+                Mail::to($ticket->email)->send(new TicketReplyMail($ticket, $reply));
             } catch (\Exception $e) {
                 \Log::error('Failed to send ticket reply email: ' . $e->getMessage());
             }
