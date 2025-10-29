@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\Admin\SubscriptionPlanController as AdminSubscri
 use App\Http\Controllers\Api\V1\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\V1\Admin\DriveAccountController as AdminDriveAccountController;
 use App\Http\Controllers\Api\V1\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Api\V1\Admin\SupportTicketController as AdminSupportTicketController;
 
 
 Route::prefix('v1')->group(function () {
@@ -120,6 +121,15 @@ Route::prefix('v1')->group(function () {
 
             Route::get('/setting', [AdminSettingsController::class, 'index']);
             Route::post('/setting', [AdminSettingsController::class, 'storeOrUpdate']);
+
+            // Support Tickets
+            Route::get('/support-tickets', [AdminSupportTicketController::class, 'index']);
+            Route::get('/support-tickets/statistics', [AdminSupportTicketController::class, 'statistics']);
+            Route::get('/support-tickets/{id}', [AdminSupportTicketController::class, 'show']);
+            Route::post('/support-tickets', [AdminSupportTicketController::class, 'store']);
+            Route::put('/support-tickets/{id}', [AdminSupportTicketController::class, 'update']);
+            Route::post('/support-tickets/{id}/reply', [AdminSupportTicketController::class, 'reply']);
+            Route::delete('/support-tickets/{id}', [AdminSupportTicketController::class, 'destroy']);
         });
     });
 
