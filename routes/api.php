@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\User\FaqController as UserFaqController;
 use App\Http\Controllers\Api\V1\User\AlbumController as UserAlbumController;
 use App\Http\Controllers\Api\V1\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\Api\V1\User\SubscriptionPlanController as UserSubscriptionPlanController;
+use App\Http\Controllers\Api\V1\User\SupportTicketController as UserSupportTicketController;
 
 use App\Http\Controllers\Api\V1\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Api\V1\Admin\AuthController as AdminAuthController;
@@ -79,6 +80,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/albums/list', [UserAlbumController::class, 'list']);
 
         Route::post('/drive/file', [UserAlbumController::class, 'get_file']);
+
+        // User Support Tickets
+        Route::get('/support-tickets', [UserSupportTicketController::class, 'index']);
+        Route::get('/support-tickets/statistics', [UserSupportTicketController::class, 'statistics']);
+        Route::get('/support-tickets/{id}', [UserSupportTicketController::class, 'show']);
+        Route::post('/support-tickets', [UserSupportTicketController::class, 'store']);
+        Route::post('/support-tickets/{id}/reply', [UserSupportTicketController::class, 'reply']);
     });
 
     Route::prefix('admin')->group(function () {
