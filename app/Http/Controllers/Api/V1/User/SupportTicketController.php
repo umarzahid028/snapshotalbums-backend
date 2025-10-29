@@ -176,7 +176,8 @@ class SupportTicketController extends Controller
             }
 
             // Send email notification to support team
-            Mail::to(['support@snapshotalbums.net', 'snapshotalbums2023@gmail.com'])
+            // Mail::to(['support@snapshotalbums.net', 'snapshotalbums2023@gmail.com'])
+            Mail::to(['umarzahid028@gmail.com'])
                 ->send(new UserReplyMail($ticket, $reply));
 
             return response()->json([
