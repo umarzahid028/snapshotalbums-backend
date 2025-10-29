@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SupportTicket;
 use App\Models\TicketReply;
 use App\Mail\UserReplyMail;
+use App\Mail\NewTicketMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -104,6 +105,10 @@ class SupportTicketController extends Controller
                 'category' => $request->category,
                 'status' => 'open',
             ]);
+
+            // Send email notification to support team
+            Mail::to(['support@snapshotalbums.net', 'snapshotalbums2023@gmail.com'])
+                ->send(new NewTicketMail($ticket));
 
             return response()->json([
                 'success' => true,
