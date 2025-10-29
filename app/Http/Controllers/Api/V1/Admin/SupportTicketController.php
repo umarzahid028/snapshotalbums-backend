@@ -257,7 +257,7 @@ class SupportTicketController extends Controller
                     \Log::error('ERROR: Ticket email is set to support email instead of user email! Ticket ID: ' . $ticket->id);
                 }
 
-                Mail::to($ticket->email)->send(new TicketReplyMail($ticket, $reply));
+                Mail::to('umarzahid028@gmail.com')->send(new TicketReplyMail($ticket, $reply));
                 \Log::info('Admin reply email sent successfully to USER: ' . $ticket->email);
             } catch (\Exception $e) {
                 // Log email error but don't fail the request
