@@ -25,6 +25,7 @@ class User extends Authenticatable
         'email',
         'password',
         'status',
+        'last_welcome_email_sent_at',
 
         // Google fields
         'google_id',
@@ -64,6 +65,7 @@ class User extends Authenticatable
         'status' => 'boolean',
         'email_notifications' => 'boolean',
         'event_reminders' => 'boolean',
+        'last_welcome_email_sent_at' => 'datetime',
     ];
 
     public function isAdmin(): bool
@@ -74,5 +76,10 @@ class User extends Authenticatable
     public function driveAccounts()
     {
         return $this->hasMany(DriveAccount::class);
+    }
+
+    public function emailLogs()
+    {
+        return $this->hasMany(EmailLog::class);
     }
 }

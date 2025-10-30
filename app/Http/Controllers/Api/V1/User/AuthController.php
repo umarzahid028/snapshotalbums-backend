@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Api\V1\User;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\DriveAccount;
+use App\Models\EmailLog;
+use App\Mail\WelcomeMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -80,6 +83,32 @@ class AuthController extends Controller
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
         ]);
+
+        // Send welcome email immediately
+        try {
+            Mail::to($user->email)->send(new WelcomeMail($user));
+
+            // Log the sent email
+            EmailLog::create([
+                'user_id' => $user->id,
+                'email_type' => 'welcome',
+                'recipient_email' => $user->email,
+                'status' => 'sent',
+                'sent_at' => now(),
+            ]);
+
+            // Update the user's last welcome email sent timestamp
+            $user->update(['last_welcome_email_sent_at' => now()]);
+        } catch (\Exception $e) {
+            // Log the error but don't fail the registration
+            EmailLog::create([
+                'user_id' => $user->id,
+                'email_type' => 'welcome',
+                'recipient_email' => $user->email,
+                'status' => 'failed',
+                'error_message' => $e->getMessage(),
+            ]);
+        }
 
         $token = $user->createToken('api-token')->plainTextToken;
 

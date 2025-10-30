@@ -7,9 +7,12 @@ use Illuminate\Http\Request;
 use App\Models\UserSubscription;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Models\EmailLog;
 use App\Http\Resources\UserSubscriptionResource;
+use App\Mail\SubscriptionCancelledMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Stripe\Stripe;
 use Stripe\Charge;
 use Illuminate\Support\Facades\Auth;
@@ -435,6 +438,42 @@ class StripeSubscriptionController extends Controller
                 'status'   => false,
                 'ends_at'  => \Carbon\Carbon::createFromTimestamp($subscription->current_period_end),
             ]);
+
+            // Send subscription cancellation email
+            try {
+                if ($user->email && $user->email_notifications !== false) {
+                    Mail::to($user->email)->send(new SubscriptionCancelledMail($user));
+
+                    // Log the sent email
+                    EmailLog::create([
+                        'user_id' => $user->id,
+                        'email_type' => 'subscription_cancelled',
+                        'recipient_email' => $user->email,
+                        'status' => 'sent',
+                        'sent_at' => now(),
+                    ]);
+                }
+            } catch (\Exception $emailException) {
+                // Log the error but don't fail the cancellation process
+                Log::error('Failed to send subscription cancellation email', [
+                    'user_id' => $user->id,
+                    'error' => $emailException->getMessage(),
+                ]);
+
+                try {
+                    EmailLog::create([
+                        'user_id' => $user->id,
+                        'email_type' => 'subscription_cancelled',
+                        'recipient_email' => $user->email,
+                        'status' => 'failed',
+                        'error_message' => $emailException->getMessage(),
+                    ]);
+                } catch (\Exception $logError) {
+                    Log::error('Failed to log subscription cancellation email error', [
+                        'error' => $logError->getMessage(),
+                    ]);
+                }
+            }
 
             $cancelDate = \Carbon\Carbon::createFromTimestamp($subscription->current_period_end);
 

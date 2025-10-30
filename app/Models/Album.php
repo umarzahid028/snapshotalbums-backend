@@ -26,11 +26,24 @@ class Album extends Model
         'qrCode',
         'total_guests',
         'total_files',
+        'last_reminder_email_sent_at',
+        'last_post_event_email_sent_at',
+    ];
+
+    protected $casts = [
+        'event_date' => 'datetime',
+        'last_reminder_email_sent_at' => 'datetime',
+        'last_post_event_email_sent_at' => 'datetime',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function emailLogs()
+    {
+        return $this->hasMany(EmailLog::class);
     }
 
     public static function generateQrCode($album): string

@@ -67,6 +67,77 @@ Schedule::command('app:activate-albums')
         \Log::error('❌ SCHEDULER: ActivateAlbums FAILED at ' . now()->toDateTimeString());
     });
 
+// New automated email scheduling
+Schedule::command('email:send-welcome')
+    ->dailyAt('06:00')
+    ->timezone('America/New_York')
+    ->description('Send welcome emails to new users')
+    ->before(function () {
+        \Log::info('🔔 SCHEDULER: About to run SendWelcomeEmails at ' . now()->toDateTimeString());
+    })
+    ->after(function () {
+        \Log::info('✅ SCHEDULER: Completed SendWelcomeEmails at ' . now()->toDateTimeString());
+    })
+    ->onFailure(function () {
+        \Log::error('❌ SCHEDULER: SendWelcomeEmails FAILED at ' . now()->toDateTimeString());
+    });
+
+Schedule::command('email:send-trial-expiring')
+    ->dailyAt('07:00')
+    ->timezone('America/New_York')
+    ->description('Send trial expiring notifications 1 day before trial ends')
+    ->before(function () {
+        \Log::info('🔔 SCHEDULER: About to run SendTrialExpiringEmails at ' . now()->toDateTimeString());
+    })
+    ->after(function () {
+        \Log::info('✅ SCHEDULER: Completed SendTrialExpiringEmails at ' . now()->toDateTimeString());
+    })
+    ->onFailure(function () {
+        \Log::error('❌ SCHEDULER: SendTrialExpiringEmails FAILED at ' . now()->toDateTimeString());
+    });
+
+Schedule::command('email:send-event-reminders')
+    ->dailyAt('08:00')
+    ->timezone('America/New_York')
+    ->description('Send event reminder emails 7 days before the event')
+    ->before(function () {
+        \Log::info('🔔 SCHEDULER: About to run SendEventReminderEmails at ' . now()->toDateTimeString());
+    })
+    ->after(function () {
+        \Log::info('✅ SCHEDULER: Completed SendEventReminderEmails at ' . now()->toDateTimeString());
+    })
+    ->onFailure(function () {
+        \Log::error('❌ SCHEDULER: SendEventReminderEmails FAILED at ' . now()->toDateTimeString());
+    });
+
+Schedule::command('email:send-post-event')
+    ->dailyAt('09:30')
+    ->timezone('America/New_York')
+    ->description('Send post-event emails 1 day after the event')
+    ->before(function () {
+        \Log::info('🔔 SCHEDULER: About to run SendPostEventEmails at ' . now()->toDateTimeString());
+    })
+    ->after(function () {
+        \Log::info('✅ SCHEDULER: Completed SendPostEventEmails at ' . now()->toDateTimeString());
+    })
+    ->onFailure(function () {
+        \Log::error('❌ SCHEDULER: SendPostEventEmails FAILED at ' . now()->toDateTimeString());
+    });
+
+Schedule::command('email:send-subscription-cancelled')
+    ->dailyAt('12:00')
+    ->timezone('America/New_York')
+    ->description('Send subscription cancelled emails to inactive subscriptions')
+    ->before(function () {
+        \Log::info('🔔 SCHEDULER: About to run SendSubscriptionCancelledEmails at ' . now()->toDateTimeString());
+    })
+    ->after(function () {
+        \Log::info('✅ SCHEDULER: Completed SendSubscriptionCancelledEmails at ' . now()->toDateTimeString());
+    })
+    ->onFailure(function () {
+        \Log::error('❌ SCHEDULER: SendSubscriptionCancelledEmails FAILED at ' . now()->toDateTimeString());
+    });
+
 // Log scheduler heartbeat every hour
 Schedule::call(function () {
     \Log::info('💓 SCHEDULER HEARTBEAT: Laravel scheduler is running at ' . now()->toDateTimeString());
