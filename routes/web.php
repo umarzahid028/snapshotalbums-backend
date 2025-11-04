@@ -11,6 +11,6 @@ Route::get('/', function () {
 });
 
 Route::get('/test', function () {
-    Mail::to('umarzahid02*@gmail.com')->send(new EventReminderMail(Album::find(10)));
+    Mail::to('umarzahid028@gmail.com')->send(new EventReminderMail(Album::find(10)));
  });
 
