@@ -68,21 +68,24 @@ Schedule::command('app:activate-albums')
     });
 
 // New automated email scheduling
-Schedule::command('email:send-welcome')
-    ->dailyAt('06:00')
-    ->timezone('America/New_York')
-    ->description('Send welcome emails to new users')
-    ->before(function () {
-        \Log::info('🔔 SCHEDULER: About to run SendWelcomeEmails at ' . now()->toDateTimeString());
-    })
-    ->after(function () {
-        \Log::info('✅ SCHEDULER: Completed SendWelcomeEmails at ' . now()->toDateTimeString());
-    })
-    ->onFailure(function () {
-        \Log::error('❌ SCHEDULER: SendWelcomeEmails FAILED at ' . now()->toDateTimeString());
-    });
+// Schedule::command('email:send-welcome')
+//     ->dailyAt('06:00')
+//     ->timezone('America/New_York')
+//     ->description('Send welcome emails to new users')
+//     ->before(function () {
+//         \Log::info('🔔 SCHEDULER: About to run SendWelcomeEmails at ' . now()->toDateTimeString());
+//     })
+//     ->after(function () {
+//         \Log::info('✅ SCHEDULER: Completed SendWelcomeEmails at ' . now()->toDateTimeString());
+//     })
+//     ->onFailure(function () {
+//         \Log::error('❌ SCHEDULER: SendWelcomeEmails FAILED at ' . now()->toDateTimeString());
+//     });
 
-Schedule::command('email:send-trial-expiring')
+
+
+
+    Schedule::command('email:send-trial-expiring')
     ->dailyAt('07:00')
     ->timezone('America/New_York')
     ->description('Send trial expiring notifications 1 day before trial ends')
@@ -95,6 +98,8 @@ Schedule::command('email:send-trial-expiring')
     ->onFailure(function () {
         \Log::error('❌ SCHEDULER: SendTrialExpiringEmails FAILED at ' . now()->toDateTimeString());
     });
+
+
 
 Schedule::command('email:send-event-reminders')
     ->dailyAt('08:00')
