@@ -25,7 +25,7 @@
         }
 
         .email-header {
-            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             text-align: center;
             padding: 40px 20px;
@@ -48,7 +48,7 @@
         }
 
         .email-body h2 {
-            color: #7c3aed;
+            color: #10b981;
             font-size: 24px;
             margin: 0 0 20px 0;
         }
@@ -60,8 +60,8 @@
         }
 
         .welcome-message {
-            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-            border-left: 4px solid #7c3aed;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 4px solid #10b981;
             border-radius: 8px;
             padding: 25px;
             margin: 30px 0;
@@ -85,7 +85,7 @@
         }
 
         .feature-icon {
-            color: #7c3aed;
+            color: #10b981;
             font-size: 20px;
             margin-right: 12px;
             flex-shrink: 0;
@@ -103,14 +103,14 @@
 
         .email-button {
             display: inline-block;
-            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #ffffff !important;
             padding: 15px 40px;
             text-decoration: none;
             border-radius: 6px;
             font-weight: bold;
             font-size: 16px;
-            box-shadow: 0 4px 6px rgba(124, 58, 237, 0.2);
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
         }
 
         .email-footer {
@@ -178,7 +178,7 @@
 
         <div class="email-footer">
             <p>&copy; {{ date('Y') }} Snapshot Albums. All rights reserved.</p>
-            <p>Have questions? <a href="mailto:support@snapshotalbums.net" style="color: #7c3aed; text-decoration: none;">Contact our support team</a></p>
+            <p>Have questions? <a href="mailto:support@snapshotalbums.net" style="color: #10b981; text-decoration: none;">Contact our support team</a></p>
         </div>
     </div>
 </body>
