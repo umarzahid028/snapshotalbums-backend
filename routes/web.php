@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\EventReminderMail;
+use App\Models\Album;
 
 Route::get('/', function () {
    return response('Welcome to the snapshotalbums. This route is for testing purposes.');
