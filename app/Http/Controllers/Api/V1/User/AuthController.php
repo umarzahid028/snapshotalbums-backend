@@ -264,6 +264,32 @@ class AuthController extends Controller
                         'google_refresh_token' => $tokenData['refresh_token'] ?? null,
                         'google_token_expires_in' => $tokenData['expires_in'],
                     ]);
+
+                    // Send welcome email immediately for new Google signup
+                    try {
+                        Mail::to($user->email)->send(new WelcomeMail($user));
+
+                        // Log the sent email
+                        EmailLog::create([
+                            'user_id' => $user->id,
+                            'email_type' => 'welcome',
+                            'recipient_email' => $user->email,
+                            'status' => 'sent',
+                            'sent_at' => now(),
+                        ]);
+
+                        // Update the user's last welcome email sent timestamp
+                        $user->update(['last_welcome_email_sent_at' => now()]);
+                    } catch (\Exception $e) {
+                        // Log the error but don't fail the registration
+                        EmailLog::create([
+                            'user_id' => $user->id,
+                            'email_type' => 'welcome',
+                            'recipient_email' => $user->email,
+                            'status' => 'failed',
+                            'error_message' => $e->getMessage(),
+                        ]);
+                    }
                 }
             }
 
