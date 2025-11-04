@@ -25,7 +25,7 @@
         }
 
         .email-header {
-            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             text-align: center;
             padding: 40px 20px;
@@ -48,7 +48,7 @@
         }
 
         .email-body h2 {
-            color: #f59e0b;
+            color: #10b981;
             font-size: 24px;
             margin: 0 0 20px 0;
         }
@@ -60,8 +60,8 @@
         }
 
         .trial-warning {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-left: 4px solid #f59e0b;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 4px solid #10b981;
             border-radius: 8px;
             padding: 25px;
             margin: 30px 0;
@@ -70,7 +70,7 @@
 
         .trial-warning h3 {
             margin: 0 0 15px 0;
-            color: #f59e0b;
+            color: #10b981;
             font-size: 20px;
         }
 
@@ -102,7 +102,7 @@
         }
 
         .plans-section h3 {
-            color: #f59e0b;
+            color: #10b981;
             font-size: 20px;
             margin: 0 0 15px 0;
         }
@@ -123,7 +123,7 @@
         }
 
         .plan-price {
-            color: #f59e0b;
+            color: #10b981;
             font-size: 24px;
             font-weight: bold;
             margin: 0 0 10px 0;
@@ -142,7 +142,7 @@
 
         .email-button {
             display: inline-block;
-            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #ffffff !important;
             padding: 15px 40px;
             text-decoration: none;
@@ -211,7 +211,7 @@
                 <a href="{{ $dashboardUrl }}" class="email-button">View All Plans & Subscribe</a>
             </div>
 
-            <p>Questions about our plans? Check out our <a href="{{ config('app.frontend_url') }}/pricing" style="color: #f59e0b; text-decoration: none;">pricing page</a> or contact our support team.</p>
+            <p>Questions about our plans? Check out our <a href="{{ config('app.frontend_url') }}/pricing" style="color: #10b981; text-decoration: none;">pricing page</a> or contact our support team.</p>
 
             <p>Don't miss out!<br>
                 <strong>The Snapshot Albums Team</strong>
@@ -220,7 +220,7 @@
 
         <div class="email-footer">
             <p>&copy; {{ date('Y') }} Snapshot Albums. All rights reserved.</p>
-            <p>Need help? <a href="mailto:support@snapshotalbums.net" style="color: #f59e0b; text-decoration: none;">Contact support</a></p>
+            <p>Need help? <a href="mailto:support@snapshotalbums.net" style="color: #10b981; text-decoration: none;">Contact support</a></p>
         </div>
     </div>
 </body>

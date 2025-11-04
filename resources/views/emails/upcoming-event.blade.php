@@ -25,7 +25,7 @@
         }
 
         .email-header {
-            background: linear-gradient(135deg, #15803D 0%, #22C55E 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             text-align: center;
             padding: 40px 20px;
@@ -48,7 +48,7 @@
         }
 
         .email-body h2 {
-            color: #15803D;
+            color: #10b981;
             font-size: 24px;
             margin: 0 0 20px 0;
         }
@@ -61,7 +61,7 @@
 
         .event-details {
             background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            border-left: 4px solid #15803D;
+            border-left: 4px solid #10b981;
             border-radius: 8px;
             padding: 25px;
             margin: 30px 0;
@@ -74,7 +74,7 @@
         }
 
         .event-icon {
-            color: #15803D;
+            color: #10b981;
             font-size: 24px;
             margin-right: 15px;
             width: 30px;
@@ -86,7 +86,7 @@
         }
 
         .event-detail-text strong {
-            color: #15803D;
+            color: #10b981;
             font-size: 14px;
             display: block;
             margin-bottom: 3px;
@@ -98,7 +98,7 @@
         }
 
         .countdown-box {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
             border-radius: 8px;
             padding: 20px;
             text-align: center;
@@ -131,7 +131,7 @@
 
         .email-button {
             display: inline-block;
-            background: linear-gradient(135deg, #15803D 0%, #22C55E 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #ffffff !important;
             padding: 15px 40px;
             text-decoration: none;
@@ -151,7 +151,7 @@
 
         .checklist h3 {
             margin: 0 0 15px 0;
-            color: #15803D;
+            color: #10b981;
             font-size: 18px;
         }
 
@@ -176,7 +176,7 @@
         }
 
         .email-footer a {
-            color: #15803D;
+            color: #10b981;
             text-decoration: none;
         }
 

@@ -57,8 +57,8 @@
             font-weight: bold;
             text-transform: uppercase;
         }
-        .status-open { background-color: #dbeafe; color: #1e40af; }
-        .status-in_progress { background-color: #fef3c7; color: #92400e; }
+        .status-open { background-color: #dcfce7; color: #10b981; }
+        .status-in_progress { background-color: #f0fdf4; color: #92400e; }
         .status-resolved { background-color: #d1fae5; color: #065f46; }
         .status-closed { background-color: #e5e7eb; color: #374151; }
         .priority-badge {
@@ -70,7 +70,7 @@
             text-transform: uppercase;
         }
         .priority-low { background-color: #e5e7eb; color: #374151; }
-        .priority-medium { background-color: #dbeafe; color: #1e40af; }
+        .priority-medium { background-color: #dcfce7; color: #10b981; }
         .priority-high { background-color: #fed7aa; color: #92400e; }
         .priority-urgent { background-color: #fecaca; color: #991b1b; }
     </style>
@@ -111,7 +111,7 @@
             </p>
         </div>
 
-        <div style="background-color: #fef3c7; padding: 15px; border-radius: 5px; margin-top: 20px;">
+        <div style="background-color: #f0fdf4; padding: 15px; border-radius: 5px; margin-top: 20px;">
             <p style="margin: 0;">
                 <strong>Action Required:</strong> Please log in to the admin dashboard to view the full conversation and respond to this ticket.
             </p>

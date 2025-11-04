@@ -26,7 +26,7 @@
         }
 
         .email-header {
-            background-color: #15803D;
+            background-color: #10b981;
             /* Green header */
             color: white;
             text-align: center;
@@ -45,7 +45,7 @@
 
         .email-link {
             display: inline-block;
-            background-color: #15803D;
+            background-color: #10b981;
             /* Green button */
             color: #ffffff !important;
             padding: 10px 20px;
@@ -65,7 +65,7 @@
         }
 
         .email-footer a {
-            color: #15803D;
+            color: #10b981;
             text-decoration: none;
         }
 

@@ -25,7 +25,7 @@
         }
 
         .email-header {
-            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             text-align: center;
             padding: 40px 20px;
@@ -48,7 +48,7 @@
         }
 
         .email-body h2 {
-            color: #7c3aed;
+            color: #10b981;
             font-size: 24px;
             margin: 0 0 20px 0;
         }
@@ -60,8 +60,8 @@
         }
 
         .trial-info {
-            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-            border-left: 4px solid #7c3aed;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 4px solid #10b981;
             border-radius: 8px;
             padding: 25px;
             margin: 30px 0;
@@ -70,19 +70,19 @@
 
         .trial-info h3 {
             margin: 0 0 15px 0;
-            color: #7c3aed;
+            color: #10b981;
             font-size: 20px;
         }
 
         .trial-days {
             font-size: 56px;
             font-weight: bold;
-            color: #7c3aed;
+            color: #10b981;
             margin: 15px 0;
         }
 
         .trial-expires {
-            color: #6b21a8;
+            color: #059669;
             font-size: 16px;
             margin-top: 10px;
         }
@@ -96,7 +96,7 @@
 
         .plan-details h3 {
             margin: 0 0 20px 0;
-            color: #7c3aed;
+            color: #10b981;
             font-size: 18px;
             text-align: center;
         }
@@ -117,7 +117,7 @@
         .plan-price .amount {
             font-size: 42px;
             font-weight: bold;
-            color: #7c3aed;
+            color: #10b981;
         }
 
         .plan-price .period {
@@ -139,7 +139,7 @@
         }
 
         .feature-icon {
-            color: #7c3aed;
+            color: #10b981;
             font-size: 20px;
             margin-right: 12px;
             flex-shrink: 0;
@@ -157,18 +157,18 @@
 
         .email-button {
             display: inline-block;
-            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #ffffff !important;
             padding: 15px 40px;
             text-decoration: none;
             border-radius: 6px;
             font-weight: bold;
             font-size: 16px;
-            box-shadow: 0 4px 6px rgba(124, 58, 237, 0.2);
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
         }
 
         .tips-section {
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
             border-left: 4px solid #10b981;
             border-radius: 8px;
             padding: 25px;
@@ -211,7 +211,7 @@
         }
 
         .important-note {
-            background-color: #fef3c7;
+            background-color: #f0fdf4;
             border: 2px solid #fbbf24;
             border-radius: 8px;
             padding: 20px;
@@ -241,7 +241,7 @@
         }
 
         .email-footer a {
-            color: #7c3aed;
+            color: #10b981;
             text-decoration: none;
         }
 

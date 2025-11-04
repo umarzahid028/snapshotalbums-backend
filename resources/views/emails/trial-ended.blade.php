@@ -25,7 +25,7 @@
         }
 
         .email-header {
-            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             text-align: center;
             padding: 40px 20px;
@@ -48,7 +48,7 @@
         }
 
         .email-body h2 {
-            color: #dc2626;
+            color: #10b981;
             font-size: 24px;
             margin: 0 0 20px 0;
         }
@@ -60,8 +60,8 @@
         }
 
         .trial-summary {
-            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-            border-left: 4px solid #dc2626;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 4px solid #10b981;
             border-radius: 8px;
             padding: 25px;
             margin: 30px 0;
@@ -69,7 +69,7 @@
 
         .trial-summary h3 {
             margin: 0 0 15px 0;
-            color: #dc2626;
+            color: #10b981;
             font-size: 18px;
         }
 
@@ -91,7 +91,7 @@
         .stat-item .number {
             font-size: 32px;
             font-weight: bold;
-            color: #dc2626;
+            color: #10b981;
         }
 
         .stat-item .label {
@@ -116,7 +116,7 @@
         }
 
         .plan-card.featured {
-            border-color: #15803D;
+            border-color: #10b981;
             background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
         }
 
@@ -124,7 +124,7 @@
             position: absolute;
             top: -12px;
             right: 20px;
-            background: linear-gradient(135deg, #15803D 0%, #22C55E 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             padding: 6px 15px;
             border-radius: 20px;
@@ -149,7 +149,7 @@
         .plan-price {
             font-size: 28px;
             font-weight: bold;
-            color: #15803D;
+            color: #10b981;
         }
 
         .plan-price .period {
@@ -172,7 +172,7 @@
 
         .plan-feature::before {
             content: "✓";
-            color: #15803D;
+            color: #10b981;
             font-weight: bold;
             margin-right: 10px;
         }
@@ -184,7 +184,7 @@
 
         .email-button {
             display: inline-block;
-            background: linear-gradient(135deg, #15803D 0%, #22C55E 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #ffffff !important;
             padding: 15px 40px;
             text-decoration: none;
@@ -197,19 +197,19 @@
         .secondary-button {
             display: inline-block;
             background-color: #ffffff;
-            color: #15803D !important;
+            color: #10b981 !important;
             padding: 13px 38px;
             text-decoration: none;
             border-radius: 6px;
             font-weight: bold;
             font-size: 16px;
-            border: 2px solid #15803D;
+            border: 2px solid #10b981;
             margin-left: 10px;
         }
 
         .free-plan-info {
-            background-color: #eff6ff;
-            border-left: 4px solid #3b82f6;
+            background-color: #f0fdf4;
+            border-left: 4px solid #10b981;
             border-radius: 8px;
             padding: 20px;
             margin: 30px 0;
@@ -217,7 +217,7 @@
 
         .free-plan-info h3 {
             margin: 0 0 10px 0;
-            color: #1e40af;
+            color: #10b981;
             font-size: 16px;
         }
 
@@ -243,7 +243,7 @@
 
         .testimonial-author {
             font-weight: bold;
-            color: #15803D;
+            color: #10b981;
             font-style: normal;
         }
 
@@ -257,7 +257,7 @@
         }
 
         .email-footer a {
-            color: #15803D;
+            color: #10b981;
             text-decoration: none;
         }
 
@@ -332,7 +332,7 @@
             <p><strong>Don't lose access to your premium features!</strong> Choose a plan below to continue using SnapshotAlbums without interruption.</p>
 
             <div class="plan-options">
-                <h3 style="text-align: center; color: #15803D; margin-bottom: 20px;">Choose Your Plan</h3>
+                <h3 style="text-align: center; color: #10b981; margin-bottom: 20px;">Choose Your Plan</h3>
 
                 @foreach($availablePlans ?? [] as $plan)
                 <div class="plan-card {{ $plan->is_popular ? 'featured' : '' }}">

@@ -25,7 +25,7 @@
         }
 
         .email-header {
-            background: linear-gradient(135deg, #15803D 0%, #22C55E 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             text-align: center;
             padding: 40px 20px;
@@ -48,7 +48,7 @@
         }
 
         .email-body h2 {
-            color: #15803D;
+            color: #10b981;
             font-size: 24px;
             margin: 0 0 20px 0;
         }
@@ -77,7 +77,7 @@
         .stat-box .number {
             font-size: 36px;
             font-weight: bold;
-            color: #15803D;
+            color: #10b981;
             margin: 10px 0;
         }
 
@@ -97,7 +97,7 @@
 
         .event-summary h3 {
             margin: 0 0 15px 0;
-            color: #15803D;
+            color: #10b981;
             font-size: 18px;
         }
 
@@ -130,7 +130,7 @@
 
         .email-button {
             display: inline-block;
-            background: linear-gradient(135deg, #15803D 0%, #22C55E 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #ffffff !important;
             padding: 15px 40px;
             text-decoration: none;
@@ -144,18 +144,18 @@
         .secondary-button {
             display: inline-block;
             background-color: #ffffff;
-            color: #15803D !important;
+            color: #10b981 !important;
             padding: 15px 40px;
             text-decoration: none;
             border-radius: 6px;
             font-weight: bold;
             font-size: 16px;
-            border: 2px solid #15803D;
+            border: 2px solid #10b981;
             margin: 5px;
         }
 
         .next-steps {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
             border-left: 4px solid #3b82f6;
             border-radius: 8px;
             padding: 25px;
@@ -215,7 +215,7 @@
         }
 
         .email-footer a {
-            color: #15803D;
+            color: #10b981;
             text-decoration: none;
         }
 

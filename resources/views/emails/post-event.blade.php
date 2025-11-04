@@ -25,7 +25,7 @@
         }
 
         .email-header {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             text-align: center;
             padding: 40px 20px;
@@ -48,7 +48,7 @@
         }
 
         .email-body h2 {
-            color: #3b82f6;
+            color: #10b981;
             font-size: 24px;
             margin: 0 0 20px 0;
         }
@@ -60,8 +60,8 @@
         }
 
         .celebration-message {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            border-left: 4px solid #3b82f6;
+            background: linear-gradient(135deg, #dcfce7 0%, #dcfce7 100%);
+            border-left: 4px solid #10b981;
             border-radius: 8px;
             padding: 25px;
             margin: 30px 0;
@@ -70,13 +70,13 @@
 
         .celebration-message h3 {
             margin: 0 0 10px 0;
-            color: #1d4ed8;
+            color: #059669;
             font-size: 22px;
         }
 
         .celebration-message p {
             margin: 10px 0;
-            color: #1e40af;
+            color: #10b981;
             font-size: 16px;
         }
 
@@ -89,7 +89,7 @@
         }
 
         .recap-title {
-            color: #3b82f6;
+            color: #10b981;
             font-size: 18px;
             font-weight: bold;
             margin: 0 0 15px 0;
@@ -105,7 +105,7 @@
         }
 
         .recap-icon {
-            color: #3b82f6;
+            color: #10b981;
             font-size: 20px;
             margin-right: 12px;
             flex-shrink: 0;
@@ -118,8 +118,8 @@
         }
 
         .upload-info {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border: 2px dashed #3b82f6;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 2px dashed #10b981;
             border-radius: 8px;
             padding: 25px;
             margin: 30px 0;
@@ -128,7 +128,7 @@
 
         .upload-info h3 {
             margin: 0 0 10px 0;
-            color: #3b82f6;
+            color: #10b981;
             font-size: 18px;
         }
 
@@ -148,7 +148,7 @@
 
         .qr-section h4 {
             margin: 0 0 10px 0;
-            color: #3b82f6;
+            color: #10b981;
             font-size: 16px;
         }
 
@@ -173,7 +173,7 @@
 
         .email-button {
             display: inline-block;
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #ffffff !important;
             padding: 15px 40px;
             text-decoration: none;
@@ -186,14 +186,14 @@
         .secondary-button {
             display: inline-block;
             background-color: #f3f4f6;
-            color: #3b82f6 !important;
+            color: #10b981 !important;
             padding: 12px 30px;
             text-decoration: none;
             border-radius: 6px;
             font-weight: bold;
             font-size: 15px;
             margin-left: 10px;
-            border: 2px solid #3b82f6;
+            border: 2px solid #10b981;
         }
 
         .email-footer {
@@ -269,7 +269,7 @@
 
         <div class="email-footer">
             <p>&copy; {{ date('Y') }} Snapshot Albums. All rights reserved.</p>
-            <p>Questions? <a href="mailto:support@snapshotalbums.net" style="color: #3b82f6; text-decoration: none;">Contact our support team</a></p>
+            <p>Questions? <a href="mailto:support@snapshotalbums.net" style="color: #10b981; text-decoration: none;">Contact our support team</a></p>
         </div>
     </div>
 </body>

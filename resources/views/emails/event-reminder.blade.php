@@ -60,7 +60,7 @@
         }
 
         .event-info {
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
             border-left: 4px solid #10b981;
             border-radius: 8px;
             padding: 25px;

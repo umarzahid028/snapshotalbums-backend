@@ -25,7 +25,7 @@
         }
 
         .email-header {
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             text-align: center;
             padding: 40px 20px;
@@ -48,7 +48,7 @@
         }
 
         .email-body h2 {
-            color: #6366f1;
+            color: #10b981;
             font-size: 24px;
             margin: 0 0 20px 0;
         }
@@ -60,8 +60,8 @@
         }
 
         .confirmation-message {
-            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-            border-left: 4px solid #6366f1;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 4px solid #10b981;
             border-radius: 8px;
             padding: 25px;
             margin: 30px 0;
@@ -69,7 +69,7 @@
 
         .confirmation-message h3 {
             margin: 0 0 10px 0;
-            color: #4f46e5;
+            color: #059669;
             font-size: 20px;
         }
 
@@ -86,7 +86,7 @@
         }
 
         .what-happens h3 {
-            color: #6366f1;
+            color: #10b981;
             font-size: 18px;
             margin: 0 0 15px 0;
         }
@@ -101,7 +101,7 @@
         }
 
         .info-icon {
-            color: #6366f1;
+            color: #10b981;
             font-size: 20px;
             margin-right: 12px;
             flex-shrink: 0;
@@ -114,8 +114,8 @@
         }
 
         .feedback-section {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-left: 4px solid #f59e0b;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 4px solid #10b981;
             border-radius: 8px;
             padding: 25px;
             margin: 30px 0;
@@ -172,14 +172,14 @@
         .dashboard-link {
             display: inline-block;
             background-color: #f3f4f6;
-            color: #6366f1 !important;
+            color: #10b981 !important;
             padding: 12px 30px;
             text-decoration: none;
             border-radius: 6px;
             font-weight: bold;
             font-size: 15px;
             margin-left: 10px;
-            border: 2px solid #6366f1;
+            border: 2px solid #10b981;
         }
 
         .email-footer {
@@ -261,7 +261,7 @@
 
         <div class="email-footer">
             <p>&copy; {{ date('Y') }} Snapshot Albums. All rights reserved.</p>
-            <p>Questions about your cancellation? <a href="mailto:support@snapshotalbums.net" style="color: #6366f1; text-decoration: none;">Contact support</a></p>
+            <p>Questions about your cancellation? <a href="mailto:support@snapshotalbums.net" style="color: #10b981; text-decoration: none;">Contact support</a></p>
         </div>
     </div>
 </body>

@@ -25,7 +25,7 @@
         }
 
         .email-header {
-            background: linear-gradient(135deg, #15803D 0%, #22C55E 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             text-align: center;
             padding: 40px 20px;
@@ -48,7 +48,7 @@
         }
 
         .email-body h2 {
-            color: #15803D;
+            color: #10b981;
             font-size: 24px;
             margin: 0 0 20px 0;
         }
@@ -66,7 +66,7 @@
 
         .email-button {
             display: inline-block;
-            background: linear-gradient(135deg, #15803D 0%, #22C55E 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #ffffff !important;
             padding: 15px 40px;
             text-decoration: none;
@@ -94,7 +94,7 @@
         }
 
         .feature-icon {
-            color: #15803D;
+            color: #10b981;
             font-size: 24px;
             margin-right: 15px;
             flex-shrink: 0;
@@ -106,7 +106,7 @@
 
         .feature-text h3 {
             margin: 0 0 5px 0;
-            color: #15803D;
+            color: #10b981;
             font-size: 18px;
         }
 
@@ -126,7 +126,7 @@
         }
 
         .email-footer a {
-            color: #15803D;
+            color: #10b981;
             text-decoration: none;
         }
 
@@ -137,7 +137,7 @@
         .social-links a {
             display: inline-block;
             margin: 0 10px;
-            color: #15803D;
+            color: #10b981;
             text-decoration: none;
         }
 
@@ -217,7 +217,7 @@
                 <a href="{{ config('app.frontend_url') }}/dashboard" class="email-button">Go to Dashboard</a>
             </div>
 
-            <p>Need help getting started? Check out our <a href="{{ config('app.frontend_url') }}/features" style="color: #15803D; text-decoration: none;">features guide</a> or <a href="{{ config('app.frontend_url') }}/contact" style="color: #15803D; text-decoration: none;">contact our support team</a>.</p>
+            <p>Need help getting started? Check out our <a href="{{ config('app.frontend_url') }}/features" style="color: #10b981; text-decoration: none;">features guide</a> or <a href="{{ config('app.frontend_url') }}/contact" style="color: #10b981; text-decoration: none;">contact our support team</a>.</p>
 
             <p>Happy collecting!</p>
 
