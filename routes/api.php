@@ -99,6 +99,11 @@ Route::prefix('v1')->group(function () {
 
             Route::get('/dashboard', [AdminAuthController::class, 'dashboard']);
 
+            // Admin Profile Routes
+            Route::get('/profile', [AdminAuthController::class, 'profile']);
+            Route::post('/profile/update', [AdminAuthController::class, 'updateProfile']);
+            Route::post('/profile/update-password', [AdminAuthController::class, 'updatePassword']);
+
 
             Route::get('/all-user', [AdminUserController::class, 'index']);
             Route::post('/user', [AdminUserController::class, 'store']);

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
@@ -157,5 +158,122 @@ class AuthController extends Controller
             'planUsage' => $planUsage,
             'latestSubscriptions' => $latestSubscriptions,
         ], 200);
+    }
+
+    // Get Admin Profile
+    public function profile(Request $request)
+    {
+        try {
+            $admin = $request->user();
+
+            if (!$admin) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+            return response()->json([
+                'success' => true,
+                'admin' => [
+                    'id' => $admin->id,
+                    'name' => $admin->name,
+                    'email' => $admin->email,
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Admin Profile Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later.'
+            ], 500);
+        }
+    }
+
+    // Update Admin Profile (Email and Name)
+    public function updateProfile(Request $request)
+    {
+        try {
+            $admin = $request->user();
+
+            if (!$admin) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+            $data = $request->validate([
+                'name' => 'nullable|string|max:255',
+                'email' => [
+                    'nullable',
+                    'email',
+                    'max:255',
+                    Rule::unique('admins')->ignore($admin->id),
+                ],
+            ]);
+
+            $admin->update($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully',
+                'admin' => [
+                    'id' => $admin->id,
+                    'name' => $admin->name,
+                    'email' => $admin->email,
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Admin Update Profile Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update profile. ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    // Update Admin Password
+    public function updatePassword(Request $request)
+    {
+        try {
+            $admin = $request->user();
+
+            if (!$admin) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+            // Validate request
+            $data = $request->validate([
+                'currentPassword' => 'required|string|min:6',
+                'new_password' => 'required|string|min:6|confirmed',
+            ]);
+
+            // Check current password
+            if (!Hash::check($data['currentPassword'], $admin->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Current password is incorrect.'
+                ], 422);
+            }
+
+            // Update password
+            $admin->password = Hash::make($data['new_password']);
+            $admin->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password updated successfully.'
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Admin Update Password Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update password. ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }
