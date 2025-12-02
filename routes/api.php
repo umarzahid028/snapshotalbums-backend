@@ -20,6 +20,8 @@ use App\Http\Controllers\Api\V1\Admin\DriveAccountController as AdminDriveAccoun
 use App\Http\Controllers\Api\V1\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Api\V1\Admin\SupportTicketController as AdminSupportTicketController;
 use App\Http\Controllers\Api\V1\Admin\HomePageContentController as AdminHomePageContentController;
+use App\Http\Controllers\Api\V1\Admin\EventTypeController as AdminEventTypeController;
+use App\Http\Controllers\Api\V1\Admin\SameDayWishController as AdminSameDayWishController;
 
 
 Route::prefix('v1')->group(function () {
@@ -45,6 +47,9 @@ Route::prefix('v1')->group(function () {
     Route::get('/faqs', [UserFaqController::class, 'index']);
 
     Route::get('/plan', [UserSubscriptionPlanController::class, 'index']);
+
+    Route::get('/event-types', [AdminEventTypeController::class, 'index']);
+    Route::get('/same-day-wishes', [AdminSameDayWishController::class, 'index']);
 
     Route::post('/get-token', [UserAuthController::class, 'token']);
 
@@ -145,6 +150,20 @@ Route::prefix('v1')->group(function () {
             Route::post('/home-content', [AdminHomePageContentController::class, 'store']);
             Route::put('/home-content/{id}', [AdminHomePageContentController::class, 'update']);
             Route::delete('/home-content/{id}', [AdminHomePageContentController::class, 'destroy']);
+
+            // Event Types
+            Route::get('/event-types', [AdminEventTypeController::class, 'all']);
+            Route::get('/event-types/{id}', [AdminEventTypeController::class, 'show']);
+            Route::post('/event-types', [AdminEventTypeController::class, 'store']);
+            Route::put('/event-types/{id}', [AdminEventTypeController::class, 'update']);
+            Route::delete('/event-types/{id}', [AdminEventTypeController::class, 'destroy']);
+
+            // Same Day Wishes
+            Route::get('/same-day-wishes', [AdminSameDayWishController::class, 'all']);
+            Route::get('/same-day-wishes/{id}', [AdminSameDayWishController::class, 'show']);
+            Route::post('/same-day-wishes', [AdminSameDayWishController::class, 'store']);
+            Route::put('/same-day-wishes/{id}', [AdminSameDayWishController::class, 'update']);
+            Route::delete('/same-day-wishes/{id}', [AdminSameDayWishController::class, 'destroy']);
 
             // Support Tickets
             Route::get('/support-tickets', [AdminSupportTicketController::class, 'index']);

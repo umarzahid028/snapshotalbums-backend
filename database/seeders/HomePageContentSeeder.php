@@ -120,6 +120,109 @@ class HomePageContentSeeder extends Seeder
                 'order' => 3
             ],
             [
+                'section' => 'event_types',
+                'content' => [
+                    'headline' => 'Perfect for Every Special Occasion',
+                    'subheadline' => 'From intimate celebrations to grand events, Snapshot Albums helps you capture every moment',
+                    'types' => [
+                        [
+                            'icon' => 'Heart',
+                            'title' => 'Weddings',
+                            'description' => 'Capture every precious moment of your special day',
+                            'image' => 'https://images.pexels.com/photos/265856/pexels-photo-265856.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
+                            'features' => [
+                                'Ceremony photos',
+                                'Reception moments',
+                                'Guest interactions',
+                                'Behind-the-scenes'
+                            ]
+                        ],
+                        [
+                            'icon' => 'Cake',
+                            'title' => 'Birthdays',
+                            'description' => 'Celebrate life\'s milestones with friends and family',
+                            'image' => 'https://images.pexels.com/photos/140831/pexels-photo-140831.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
+                            'features' => [
+                                'Party photos',
+                                'Cake cutting',
+                                'Gift opening',
+                                'Fun moments'
+                            ]
+                        ],
+                        [
+                            'icon' => 'Gift',
+                            'title' => 'Anniversaries',
+                            'description' => 'Mark another year of love and togetherness',
+                            'image' => 'https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop',
+                            'features' => [
+                                'Romantic moments',
+                                'Celebration photos',
+                                'Memories',
+                                'Special occasions'
+                            ]
+                        ],
+                        [
+                            'icon' => 'Users',
+                            'title' => 'Corporate Events',
+                            'description' => 'Professional gatherings and team celebrations',
+                            'image' => 'https://images.pexels.com/photos/1181391/pexels-photo-1181391.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
+                            'features' => [
+                                'Team photos',
+                                'Event coverage',
+                                'Professional shots',
+                                'Networking moments'
+                            ]
+                        ]
+                    ]
+                ],
+                'is_active' => true,
+                'order' => 4
+            ],
+            [
+                'section' => 'same_day_wishes',
+                'content' => [
+                    'headline' => 'Same-Day Wishes & Messages',
+                    'subheadline' => 'Share heartfelt messages and wishes instantly with your guests. Perfect for birthdays, weddings, and special celebrations.',
+                    'wishes' => [
+                        [
+                            'type' => 'Birthday',
+                            'icon' => 'Heart',
+                            'image' => 'https://images.pexels.com/photos/140831/pexels-photo-140831.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop',
+                            'messages' => [
+                                'Happy Birthday! 🎉 May your special day be filled with joy, laughter, and wonderful memories!',
+                                'Wishing you a year ahead filled with happiness, success, and all your dreams coming true!',
+                                'Another year older, another year wiser! Hope your birthday is as amazing as you are!',
+                                'May this new year of life bring you endless joy and countless reasons to smile!'
+                            ]
+                        ],
+                        [
+                            'type' => 'Wedding',
+                            'icon' => 'Heart',
+                            'image' => 'https://images.pexels.com/photos/265856/pexels-photo-265856.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop',
+                            'messages' => [
+                                'Congratulations on your wedding day! 🎊 Wishing you both a lifetime of love, happiness, and beautiful memories together!',
+                                'May your marriage be filled with love, laughter, and countless adventures! Here\'s to forever!',
+                                'Two hearts, one love! Wishing you both endless joy and a lifetime of wonderful moments together!',
+                                'May your wedding day be the beginning of a beautiful journey filled with love and happiness!'
+                            ]
+                        ],
+                        [
+                            'type' => 'Anniversary',
+                            'icon' => 'Star',
+                            'image' => 'https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop',
+                            'messages' => [
+                                'Happy Anniversary! 🎉 Celebrating another year of love, laughter, and beautiful memories together!',
+                                'May your love continue to grow stronger with each passing year! Here\'s to many more!',
+                                'Wishing you both continued happiness and love as you celebrate another year together!',
+                                'Another year of love, another year of memories! May your bond grow even stronger!'
+                            ]
+                        ]
+                    ]
+                ],
+                'is_active' => true,
+                'order' => 5
+            ],
+            [
                 'section' => 'cta',
                 'content' => [
                     'headline' => 'Ready to Capture Your Special Moments?',
@@ -145,7 +248,7 @@ class HomePageContentSeeder extends Seeder
                     ]
                 ],
                 'is_active' => true,
-                'order' => 4
+                'order' => 6
             ]
         ];
 
