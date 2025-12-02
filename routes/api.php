@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\V1\Admin\DriveAccountController as AdminDriveAccountController;
 use App\Http\Controllers\Api\V1\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Api\V1\Admin\SupportTicketController as AdminSupportTicketController;
+use App\Http\Controllers\Api\V1\Admin\HomePageContentController as AdminHomePageContentController;
 
 
 Route::prefix('v1')->group(function () {
@@ -137,6 +138,13 @@ Route::prefix('v1')->group(function () {
 
             Route::get('/setting', [AdminSettingsController::class, 'index']);
             Route::post('/setting', [AdminSettingsController::class, 'storeOrUpdate']);
+
+            // Home Page Content
+            Route::get('/home-content', [AdminHomePageContentController::class, 'index']);
+            Route::get('/home-content/{id}', [AdminHomePageContentController::class, 'show']);
+            Route::post('/home-content', [AdminHomePageContentController::class, 'store']);
+            Route::put('/home-content/{id}', [AdminHomePageContentController::class, 'update']);
+            Route::delete('/home-content/{id}', [AdminHomePageContentController::class, 'destroy']);
 
             // Support Tickets
             Route::get('/support-tickets', [AdminSupportTicketController::class, 'index']);

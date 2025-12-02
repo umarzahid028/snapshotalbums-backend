@@ -9,6 +9,7 @@ use App\Models\Setting;
 use App\Models\SubscriptionPlan;
 use App\Models\UserSubscription;
 use App\Models\FAQ;
+use App\Models\HomePageContent;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -95,9 +96,16 @@ class DashboardController extends Controller
 
         $faqs = FAQ::where('is_active', true)->where('category', 'Home')->latest()->get();
 
+        // Fetch home page content sections
+        $homeContent = HomePageContent::where('is_active', true)
+            ->orderBy('order')
+            ->get()
+            ->keyBy('section'); // Group by section name for easy access
+
         return response()->json([
             'plan' => $plan,
             'faqs' => $faqs,
+            'content' => $homeContent,
         ], 200);
     }
 
