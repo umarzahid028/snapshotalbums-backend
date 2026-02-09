@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserSubscription;
+use App\Models\SubscriptionPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 
 class UserController extends Controller
@@ -15,7 +18,7 @@ class UserController extends Controller
     public function index()
     {
         try {
-            $users = User::all();
+            $users = User::with(['activeSubscription.plan'])->get();
 
             return response()->json([
                 'success' => true,
@@ -152,6 +155,78 @@ class UserController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'User deleted successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Something went wrong. ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // ✅ Assign subscription to user
+    public function assignSubscription(Request $request, $userId)
+    {
+        try {
+            $user = User::findOrFail($userId);
+
+            $validated = $request->validate([
+                'plan_id' => 'required|exists:subscription_plans,id',
+                'price' => 'nullable|numeric|min:0',
+                'duration_days' => 'nullable|integer|min:1',
+                'ends_at' => 'nullable|date',
+            ]);
+
+            $plan = SubscriptionPlan::findOrFail($validated['plan_id']);
+
+            // Cancel any existing active subscriptions
+            UserSubscription::where('user_id', $userId)
+                ->where('status', true)
+                ->update(['status' => false]);
+
+            // Determine end date
+            $endsAt = null;
+            if (isset($validated['ends_at'])) {
+                $endsAt = Carbon::parse($validated['ends_at']);
+            } elseif (isset($validated['duration_days'])) {
+                $endsAt = Carbon::now()->addDays($validated['duration_days']);
+            } else {
+                $endsAt = Carbon::now()->addDays($plan->duration_days);
+            }
+
+            // Create new subscription
+            $subscription = UserSubscription::create([
+                'user_id' => $userId,
+                'plan_id' => $plan->id,
+                'plan_price' => $validated['price'] ?? $plan->price,
+                'plan_duration' => $validated['duration_days'] ?? $plan->duration_days,
+                'plan_no_of_ablums' => $plan->no_of_ablums,
+                'transaction_status' => 'admin_assigned',
+                'status' => true,
+                'ends_at' => $endsAt,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Subscription assigned successfully',
+                'data' => $subscription->load('plan')
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Something went wrong. ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // ✅ Get user's subscription
+    public function getUserSubscription($userId)
+    {
+        try {
+            $user = User::findOrFail($userId);
+            $subscription = $user->activeSubscription()->with('plan')->first();
+
+            return response()->json([
+                'success' => true,
+                'data' => $subscription
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

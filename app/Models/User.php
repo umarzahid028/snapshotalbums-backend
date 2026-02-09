@@ -82,4 +82,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(EmailLog::class);
     }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(UserSubscription::class)
+            ->where('status', true)
+            ->where('ends_at', '>', now());
+    }
 }
