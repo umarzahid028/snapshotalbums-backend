@@ -116,6 +116,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/user/{id}', [AdminUserController::class, 'show']);
             Route::put('/user/{id}', [AdminUserController::class, 'update']);
             Route::delete('/user/{id}', [AdminUserController::class, 'destroy']);
+            Route::post('/user/{id}/grant-subscription', [AdminUserController::class, 'grantSubscription']);
             Route::post('/user/{userId}/assign-subscription', [AdminUserController::class, 'assignSubscription']);
             Route::get('/user/{userId}/subscription', [AdminUserController::class, 'getUserSubscription']);
 

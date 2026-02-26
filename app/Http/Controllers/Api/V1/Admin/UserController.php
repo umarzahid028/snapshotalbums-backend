@@ -137,6 +137,67 @@ class UserController extends Controller
         ]);
     }
 
+    // Grant free subscription to a user
+    public function grantSubscription($id, Request $request)
+    {
+        try {
+            $user = User::find($id);
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not found'
+                ], 404);
+            }
+
+            $validated = $request->validate([
+                'plan_id' => 'required|exists:subscription_plans,id',
+                'duration_days' => 'nullable|integer|min:1',
+            ]);
+
+            $plan = SubscriptionPlan::findOrFail($validated['plan_id']);
+            $durationDays = $validated['duration_days'] ?? $plan->duration_days;
+
+            // Cancel any existing active subscription (DB only, no Stripe call)
+            UserSubscription::where('user_id', $user->id)
+                ->where('status', true)
+                ->update(['status' => false]);
+
+            // Create new admin-granted subscription
+            $subscription = UserSubscription::create([
+                'user_id' => $user->id,
+                'plan_id' => $plan->id,
+                'plan_price' => $plan->price,
+                'plan_duration' => $durationDays,
+                'plan_no_of_ablums' => $plan->no_of_ablums,
+                'transaction_id' => null,
+                'transaction_status' => 'admin_granted',
+                'status' => true,
+                'ends_at' => Carbon::now()->addDays($durationDays),
+                'card_last_four' => null,
+                'card_exp_month' => null,
+                'card_exp_year' => null,
+                'payment_token' => null,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Subscription granted successfully',
+                'data' => $subscription->load('plan')
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Something went wrong. ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     // ✅ Delete user
     public function destroy($id)
     {
